@@ -10520,34 +10520,46 @@
  ],
  "oppTacklesByMatch": [
   {
-   "opp": 20,
+   "oppName": "Carnew Emmets",
    "rd": 1,
-   "bray": 44
+   "bray": 44,
+   "oppCount": 20,
+   "date": "10 Mar 2026"
   },
   {
-   "opp": 24,
+   "oppName": "Rathnew",
    "rd": 2,
-   "bray": 47
+   "bray": 47,
+   "oppCount": 24,
+   "date": "23 Apr 2026"
   },
   {
-   "opp": 45,
+   "oppName": "Blessington",
    "rd": 3,
-   "bray": 37
+   "bray": 37,
+   "oppCount": 45,
+   "date": "27 Apr 2026"
   },
   {
-   "opp": 32,
+   "oppName": "\u00c9ire \u00d3g",
    "rd": 4,
-   "bray": 38
+   "bray": 38,
+   "oppCount": 32,
+   "date": "01 May 2026"
   },
   {
-   "opp": 19,
+   "oppName": "Baltinglass",
    "rd": 6,
-   "bray": 42
+   "bray": 42,
+   "oppCount": 19,
+   "date": "15 May 2026"
   },
   {
-   "opp": 22,
+   "oppName": "Blessington",
    "rd": 8,
-   "bray": 32
+   "bray": 32,
+   "oppCount": 22,
+   "date": "12 Jun 2026"
   }
  ],
  "brayTacklesSeason": 240,
@@ -10650,10 +10662,10 @@ document.getElementById('player-table').parentElement.parentElement.appendChild(
 // ---- TACKLES BY MATCH ----
 const tbmEl = document.getElementById('tackles-by-match');
 D.oppTacklesByMatch.forEach(m=>{
-  const max = Math.max(m.bray, m.opp, 1);
+  const max = Math.max(m.bray, m.oppCount, 1);
   const div = document.createElement('div');
   div.style.cssText='padding:8px 0;border-bottom:1px solid var(--border);';
-  div.innerHTML=`<div style="font-size:0.68rem;font-family:monospace;color:var(--text-dim);margin-bottom:5px;">RD${m.rd} ${m.opp.toUpperCase()}</div>
+  div.innerHTML=`<div style="font-size:0.68rem;font-family:monospace;color:var(--text-dim);margin-bottom:5px;">RD${m.rd} ${m.oppName.toUpperCase()}</div>
     <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
       <span style="width:36px;font-size:0.62rem;color:var(--green);font-family:monospace;">BRAY</span>
       <div style="flex:1;height:8px;background:rgba(255,255,255,0.05);border-radius:3px;overflow:hidden;">
@@ -10664,9 +10676,9 @@ D.oppTacklesByMatch.forEach(m=>{
     <div style="display:flex;align-items:center;gap:6px;">
       <span style="width:36px;font-size:0.62rem;color:var(--text-dim);font-family:monospace;">OPP</span>
       <div style="flex:1;height:8px;background:rgba(255,255,255,0.05);border-radius:3px;overflow:hidden;">
-        <div style="width:${m.opp/max*100}%;height:100%;background:var(--text-dim);opacity:0.5;border-radius:3px;"></div>
+        <div style="width:${m.oppCount/max*100}%;height:100%;background:var(--text-dim);opacity:0.5;border-radius:3px;"></div>
       </div>
-      <span style="width:24px;text-align:right;font-size:0.75rem;font-weight:800;color:var(--text-dim);">${m.opp}</span>
+      <span style="width:24px;text-align:right;font-size:0.75rem;font-weight:800;color:var(--text-dim);">${m.oppCount}</span>
     </div>`;
   tbmEl.appendChild(div);
 });
