@@ -1,0 +1,1785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bray Emmets SF — Rock Solid Analytics</title>
+<style>
+  :root{
+    --navy:#0c1d3e;
+    --navy-deep:#070c18;
+    --navy-card:#0d1525;
+    --green:#34c967;
+    --gold:#f0c040;
+    --red:#e04545;
+    --text:#eef2f8;
+    --text-dim:#7a90aa;
+    --border:#111a2e;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    font-family:'Segoe UI', system-ui, -apple-system, sans-serif;
+    background:var(--navy-deep);
+    color:var(--text);
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  .header{
+    background:linear-gradient(135deg, var(--navy) 0%, var(--navy-deep) 100%);
+    border-bottom:3px solid var(--green);
+    padding:20px 16px 0;
+    position:sticky;
+    top:0;
+    z-index:50;
+  }
+  .header-top{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    max-width:680px;
+    margin:0 auto;
+  }
+  .header-title{flex:1;}
+  .header-title h1{
+    font-size:1.15rem;
+    font-weight:800;
+    letter-spacing:0.02em;
+    color:var(--text);
+  }
+  .header-title p{
+    font-size:0.75rem;
+    color:var(--green);
+    text-transform:uppercase;
+    letter-spacing:0.12em;
+    font-weight:600;
+    margin-top:2px;
+  }
+  .tabs{
+    display:flex;
+    max-width:680px;
+    margin:18px auto 0;
+    gap:4px;
+  }
+  .tab{
+    flex:1;
+    text-align:center;
+    padding:12px 8px;
+    font-size:0.85rem;
+    font-weight:700;
+    color:var(--text-dim);
+    background:transparent;
+    border:none;
+    border-bottom:3px solid transparent;
+    cursor:pointer;
+    transition:all 0.15s ease;
+    letter-spacing:0.02em;
+  }
+  .tab.active{
+    color:var(--green);
+    border-bottom-color:var(--green);
+  }
+  .tab:active{opacity:0.7;}
+
+  main{
+    max-width:680px;
+    margin:0 auto;
+    padding:18px 14px 60px;
+  }
+  .view{display:none;}
+  .view.active{display:block; animation:fadeIn 0.25s ease;}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+
+  .card{
+    background:var(--navy-card);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:16px;
+    margin-bottom:14px;
+  }
+  .card-title{
+    font-size:0.78rem;
+    text-transform:uppercase;
+    letter-spacing:0.14em;
+    color:var(--text-dim);
+    font-weight:700;
+    margin-bottom:12px;
+  }
+  .card-sub{
+    font-size:0.7rem;
+    color:var(--text-dim);
+    margin-bottom:10px;
+    text-align:center;
+    font-family:monospace;
+  }
+
+  .scoreboard{text-align:center; padding:8px 0 4px;}
+  .sb-meta{font-size:0.75rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:14px;}
+  .sb-meta-line{margin-bottom:2px;}
+  .sb-row{display:flex; align-items:center; justify-content:center; gap:18px;}
+  .sb-team{flex:1; text-align:center;}
+  .sb-team-name{font-size:0.95rem; font-weight:700; margin-bottom:6px;}
+  .sb-team.us .sb-team-name{color:var(--green);}
+  .sb-score{font-size:2.4rem; font-weight:900; letter-spacing:0.01em; font-variant-numeric:tabular-nums;}
+  .sb-frees{font-size:0.78rem; color:var(--text-dim); font-weight:600; margin-top:2px;}
+  .sb-2pt{font-size:0.72rem; color:var(--gold); font-weight:700; margin-top:4px; text-transform:uppercase; letter-spacing:0.06em;}
+  .sb-vs{font-size:0.85rem; color:var(--text-dim); font-weight:700;}
+  .result-banner{margin-top:14px; padding:8px 14px; background:rgba(52,201,103,0.12); border:1px solid rgba(52,201,103,0.3); border-radius:8px; color:var(--green); font-weight:700; font-size:0.9rem; display:inline-block;}
+
+  .compare-row{display:grid; grid-template-columns:1fr 90px 1fr; align-items:center; gap:8px; padding:9px 0; border-bottom:1px solid var(--border);}
+  .compare-row:last-child{border-bottom:none;}
+  .compare-label{grid-column:1 / -1; text-align:center; font-size:0.7rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.1em; font-weight:700; margin-bottom:4px;}
+  .compare-val{font-size:1.05rem; font-weight:800; font-variant-numeric:tabular-nums;}
+  .compare-val.us{color:var(--green); text-align:right;}
+  .compare-val.them{color:var(--text); text-align:left;}
+  .compare-bar-wrap{display:flex; height:8px; border-radius:4px; overflow:hidden; background:rgba(255,255,255,0.05);}
+  .compare-bar-us{background:var(--green); height:100%;}
+  .compare-bar-them{background:var(--text-dim); height:100%; opacity:0.5;}
+
+  .lb-row{display:flex; align-items:center; justify-content:space-between; padding:9px 0; border-bottom:1px solid var(--border); font-size:0.9rem; gap:8px;}
+  .lb-row:last-child{border-bottom:none;}
+  .lb-rank{width:22px; color:var(--text-dim); font-weight:700; font-size:0.8rem; flex-shrink:0;}
+  .lb-name{flex:1; font-weight:600;}
+  .lb-val{font-weight:800; color:var(--green); font-variant-numeric:tabular-nums; font-size:0.95rem; flex-shrink:0; text-align:right;}
+  .lb-sub{font-size:0.7rem; color:var(--text-dim); font-weight:500; text-align:right; flex-shrink:0;}
+
+  .timeline-wrap{width:100%; overflow-x:auto;}
+  .timeline-svg{display:block; min-width:100%;}
+  .legend{display:flex; gap:18px; justify-content:center; margin-top:10px; font-size:0.75rem; color:var(--text-dim); flex-wrap:wrap;}
+  .legend span{display:flex; align-items:center; gap:6px;}
+  .legend .dot{width:10px; height:10px; border-radius:50%; display:inline-block;}
+
+  .result-item{display:flex; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid var(--border);}
+  .result-item:last-child{border-bottom:none;}
+  .result-badge{width:36px; height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:0.85rem; flex-shrink:0;}
+  .result-badge.W{background:rgba(52,201,103,0.15); color:var(--green); border:1px solid rgba(52,201,103,0.35);}
+  .result-badge.L{background:rgba(224,69,69,0.15); color:var(--red); border:1px solid rgba(224,69,69,0.35);}
+  .result-badge.D{background:rgba(240,192,64,0.15); color:var(--gold); border:1px solid rgba(240,192,64,0.35);}
+  .result-info{flex:1;}
+  .result-opp{font-weight:700; font-size:0.92rem;}
+  .result-date{font-size:0.72rem; color:var(--text-dim); margin-top:1px;}
+  .result-score{font-weight:800; font-size:0.95rem; font-variant-numeric:tabular-nums; text-align:right;}
+
+  .pitch-wrap{width:100%; display:flex; justify-content:center;}
+  .pitch-svg{width:100%; max-width:320px; height:auto; border-radius:8px; overflow:hidden; border:1px solid var(--border);}
+  .pitch-svg.full{max-width:280px;}
+
+  .toggle-btn{width:100%; padding:8px; background:rgba(52,201,103,0.1); border:1px solid rgba(52,201,103,0.35); border-radius:8px; cursor:pointer; color:var(--green); font-size:0.7rem; font-family:monospace; font-weight:700; margin-top:8px; letter-spacing:0.05em;}
+  .toggle-btn.off{background:var(--navy-deep); border-color:var(--border); color:var(--text-dim);}
+
+  .view-tabs{display:flex; gap:6px; margin-bottom:12px;}
+  .view-tab{flex:1; padding:10px 4px; background:var(--navy-deep); border:1px solid var(--border); border-radius:8px; cursor:pointer; color:var(--text-dim); font-size:0.7rem; font-weight:700; font-family:monospace; letter-spacing:0.03em;}
+  .view-tab.active{background:rgba(52,201,103,0.13); border-color:rgba(52,201,103,0.4); color:var(--green);}
+
+  .summary-list{list-style:none; display:flex; flex-direction:column; gap:10px;}
+  .summary-list li{padding-left:18px; position:relative; font-size:0.9rem; color:var(--text);}
+  .summary-list li::before{content:''; position:absolute; left:0; top:7px; width:8px; height:8px; border-radius:50%; background:var(--green);}
+
+  .note{font-size:0.8rem; color:var(--text-dim); text-align:center; padding:14px 10px 4px; font-style:italic;}
+
+  .stat-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; text-align:center;}
+  .stat-box{background:rgba(255,255,255,0.03); border-radius:10px; padding:12px 6px;}
+  .stat-box .num{font-size:1.3rem; font-weight:800; color:var(--green);}
+  .stat-box .lbl{font-size:0.65rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; margin-top:4px;}
+
+  .ko-grid{display:grid; grid-template-columns:50px 1fr 1fr 1fr; gap:4px;}
+  .ko-grid .colhead{font-size:0.65rem; font-family:monospace; color:var(--text-dim); text-align:center; padding-bottom:4px;}
+  .ko-grid .rowhead{font-size:0.65rem; font-family:monospace; color:var(--text-dim); display:flex; align-items:center;}
+  .ko-cell{border-radius:8px; padding:12px 4px; text-align:center; border:1px solid var(--border); background:var(--navy-deep);}
+  .ko-cell .pct{font-size:1rem; font-weight:900; font-family:monospace;}
+  .ko-cell .n{font-size:0.6rem; font-family:monospace; color:var(--text-dim); margin-top:2px;}
+
+  footer{text-align:center; padding:20px; font-size:0.72rem; color:var(--text-dim);}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div class="header-title">
+      <h1>Bray Emmets SF</h1>
+      <p>Match Report</p>
+    </div>
+  </div>
+</div>
+
+<main>
+
+  <section class="view active" id="latest">
+
+    <div class="card">
+      <div class="scoreboard">
+        <div class="sb-meta">
+          <div class="sb-meta-line" id="sb-comp"></div>
+          <div class="sb-meta-line" id="sb-venue"></div>
+        </div>
+        <div class="sb-row">
+          <div class="sb-team us">
+            <div class="sb-team-name">Bray Emmets</div>
+            <div class="sb-score" id="sb-us-score"></div>
+            <div class="sb-frees" id="sb-us-frees"></div>
+          </div>
+          <div class="sb-vs">v</div>
+          <div class="sb-team">
+            <div class="sb-team-name">Blessington</div>
+            <div class="sb-score" id="sb-them-score"></div>
+            <div class="sb-frees" id="sb-them-frees"></div>
+          </div>
+        </div>
+        <div class="sb-2pt" id="sb-2pt"></div>
+        <div class="result-banner" id="result-banner"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Score Progression</div>
+      <div class="timeline-wrap">
+        <svg class="timeline-svg" id="timeline-svg" viewBox="0 0 600 220" preserveAspectRatio="xMidYMid meet"></svg>
+      </div>
+      <div class="legend">
+        <span><i class="dot" style="background:var(--green)"></i> Bray Emmets</span>
+        <span><i class="dot" style="background:var(--text-dim)"></i> Blessington</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Team Comparison</div>
+      <div id="compare-stats"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Pitch Maps</div>
+      <div class="view-tabs">
+        <button class="view-tab active" data-pmview="shots">Our Shots</button>
+        <button class="view-tab" data-pmview="opp">Opp Shots</button>
+        <button class="view-tab" data-pmview="ko">Our KOs</button>
+        <button class="view-tab" data-pmview="oppko">Opp KOs</button>
+      </div>
+
+      <div id="pm-shots" class="pmview">
+        <div class="card-sub" id="pm-shots-sub"></div>
+        <div class="pitch-wrap"><svg class="pitch-svg" id="pitch-shots-svg" viewBox="0 0 240 200"></svg></div>
+        <button class="toggle-btn" id="zone-toggle-shots">◉ ZONE CONVERSION ON</button>
+        <div class="legend">
+          <span><i class="dot" style="background:#00ff88"></i> Score</span>
+          <span><i class="dot" style="background:#cc44ff"></i> Goal</span>
+          <span><i class="dot" style="background:#ff3355"></i> Miss</span>
+        </div>
+      </div>
+
+      <div id="pm-opp" class="pmview" style="display:none;">
+        <div class="card-sub" id="pm-opp-sub"></div>
+        <div class="pitch-wrap"><svg class="pitch-svg" id="pitch-opp-svg" viewBox="0 0 240 200"></svg></div>
+        <button class="toggle-btn" id="zone-toggle-opp">◉ ZONE CONVERSION ON</button>
+        <div class="legend">
+          <span><i class="dot" style="background:#00ff88"></i> Score</span>
+          <span><i class="dot" style="background:#cc44ff"></i> Goal</span>
+          <span><i class="dot" style="background:#ff3355"></i> Miss</span>
+        </div>
+        <div class="note">Where we concede from — lower % = better defending</div>
+      </div>
+
+      <div id="pm-ko" class="pmview" style="display:none;">
+        <div class="card-sub" id="pm-ko-sub"></div>
+        <div class="pitch-wrap"><svg class="pitch-svg full" id="pitch-ko-svg" viewBox="0 0 240 360"></svg></div>
+        <div class="legend" style="margin-bottom:14px;">
+          <span><i class="dot" style="background:#00ff88"></i> Won</span>
+          <span><i class="dot" style="background:#ff3355"></i> Lost</span>
+        </div>
+        <div class="card-title" style="margin-top:6px;">Kickout Win % by Zone</div>
+        <div class="card-sub" style="margin-bottom:10px;">Where should the keeper go under pressure</div>
+        <div class="ko-grid" id="ko-grid"></div>
+      </div>
+
+      <div id="pm-oppko" class="pmview" style="display:none;">
+        <div class="card-sub" id="pm-oppko-sub"></div>
+        <div class="pitch-wrap"><svg class="pitch-svg full" id="pitch-oppko-svg" viewBox="0 0 240 360"></svg></div>
+        <div class="legend" style="margin-bottom:14px;">
+          <span><i class="dot" style="background:#00ff88"></i> Won</span>
+          <span><i class="dot" style="background:#ff3355"></i> Lost</span>
+        </div>
+        <div class="card-title" style="margin-top:6px;">Opposition Kickout Win % by Zone</div>
+        <div class="card-sub" style="margin-bottom:10px;">Where they look to go under pressure</div>
+        <div class="ko-grid" id="oppko-grid"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Kickout Speed</div>
+      <div class="card-sub">Time from dead ball to restart (lower = faster)</div>
+      <div class="stat-grid" id="ko-speed-overall" style="margin-bottom:14px;"></div>
+      <div id="ko-speed-breakdown"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Possession Lost — Breakdown</div>
+      <div class="card-sub">Why the ball was given away</div>
+      <div style="display:flex; gap:8px;">
+        <div style="flex:1; text-align:center;">
+          <div style="font-size:0.7rem; font-family:monospace; color:var(--green); margin-bottom:6px;">BRAY EMMETS</div>
+          <svg viewBox="0 0 120 120" id="donut-us" style="width:100%; max-width:140px;"></svg>
+          <div id="donut-us-legend" style="margin-top:8px;"></div>
+        </div>
+        <div style="flex:1; text-align:center;">
+          <div style="font-size:0.7rem; font-family:monospace; color:var(--text-dim); margin-bottom:6px;">BLESSINGTON</div>
+          <svg viewBox="0 0 120 120" id="donut-them" style="width:100%; max-width:140px;"></svg>
+          <div id="donut-them-legend" style="margin-top:8px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Scorers</div>
+      <div id="match-scorers"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Tackles &amp; Frees Conceded</div>
+      <div id="match-tackles"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Manager's Briefing</div>
+      <ul class="summary-list" id="ai-summary"></ul>
+    </div>
+
+  </section>
+
+</main>
+
+<footer>Rock Solid Analytics · Bray Emmets GAA</footer>
+
+<script>window.__RSA_DATA__ = {
+ "matchMeta": {
+  "competition": "Wicklow Senior Football League",
+  "venue": "Blessington GAA",
+  "date": "12 June 2026",
+  "referee": "Jason Smyth"
+ },
+ "results": [
+  {
+   "opponent": "Tinahely",
+   "date": "26 May 2026",
+   "us": "-",
+   "them": "-",
+   "result": "D",
+   "venueTag": "data pending"
+  },
+  {
+   "opponent": "Blessington",
+   "date": "12 Jun 2026",
+   "us": "3-17",
+   "them": "3-11",
+   "result": "W",
+   "venueTag": "Away"
+  }
+ ],
+ "scoreLine": {
+  "us": {
+   "main": "3-17",
+   "frees": "0-05",
+   "twoPt": 4,
+   "twoPtF": 2
+  },
+  "them": {
+   "main": "3-11",
+   "frees": "0-05",
+   "twoPt": 3,
+   "twoPtF": 1
+  },
+  "margin": 6
+ },
+ "seasonScorers": [
+  {
+   "name": "Padraig Doyle",
+   "notation": "2-00",
+   "total": 6
+  },
+  {
+   "name": "Ryan Harrison",
+   "notation": "0-05 (0-05 f) \u00b7 2x2pt",
+   "total": 5
+  },
+  {
+   "name": "Cathal Magee",
+   "notation": "1-02",
+   "total": 5
+  },
+  {
+   "name": "Conor Broderick",
+   "notation": "0-04 \u00b7 1x2pt",
+   "total": 4
+  },
+  {
+   "name": "Des Kelly",
+   "notation": "0-02 \u00b7 1x2pt",
+   "total": 2
+  },
+  {
+   "name": "Sean Kenny",
+   "notation": "0-01",
+   "total": 1
+  },
+  {
+   "name": "Arran Murphy",
+   "notation": "0-01",
+   "total": 1
+  },
+  {
+   "name": "Rory Breslin",
+   "notation": "0-01",
+   "total": 1
+  },
+  {
+   "name": "Daragh Rochford",
+   "notation": "0-01",
+   "total": 1
+  }
+ ],
+ "seasonTackles": [
+  {
+   "name": "Conal Butler",
+   "total": 6
+  },
+  {
+   "name": "Daragh Rochford",
+   "total": 5
+  },
+  {
+   "name": "Conor Broderick",
+   "total": 5
+  },
+  {
+   "name": "Des Kelly",
+   "total": 3
+  },
+  {
+   "name": "Ryan Harrison",
+   "total": 3
+  },
+  {
+   "name": "Sam Kearney",
+   "total": 2
+  },
+  {
+   "name": "Arran Murphy",
+   "total": 2
+  },
+  {
+   "name": "Daire Lohan",
+   "total": 1
+  },
+  {
+   "name": "Oscar Harty",
+   "total": 1
+  },
+  {
+   "name": "Rory Breslin",
+   "total": 1
+  }
+ ],
+ "compare": [
+  {
+   "label": "Possession %",
+   "us": 54,
+   "them": 46
+  },
+  {
+   "label": "Total Shots",
+   "us": 27,
+   "them": 21
+  },
+  {
+   "label": "Scores From Play",
+   "us": 13,
+   "them": 7
+  },
+  {
+   "label": "Wides",
+   "us": 8,
+   "them": 7
+  },
+  {
+   "label": "Shooting Accuracy %",
+   "us": 59,
+   "them": 52
+  },
+  {
+   "label": "Frees Converted",
+   "us": 3,
+   "them": 4,
+   "usDisplay": "3/5",
+   "themDisplay": "4/6"
+  },
+  {
+   "label": "Own Kickouts Won",
+   "us": 13,
+   "them": 15,
+   "usDisplay": "13/18",
+   "themDisplay": "15/23"
+  },
+  {
+   "label": "Turnovers Won",
+   "us": 12,
+   "them": 8
+  }
+ ],
+ "matchScorers": [
+  {
+   "name": "Padraig Doyle",
+   "notation": "2-00",
+   "total": 6
+  },
+  {
+   "name": "Ryan Harrison",
+   "notation": "0-05 (0-05 f) \u00b7 2x2pt",
+   "total": 5
+  },
+  {
+   "name": "Cathal Magee",
+   "notation": "1-02",
+   "total": 5
+  },
+  {
+   "name": "Conor Broderick",
+   "notation": "0-04 \u00b7 1x2pt",
+   "total": 4
+  },
+  {
+   "name": "Des Kelly",
+   "notation": "0-02 \u00b7 1x2pt",
+   "total": 2
+  },
+  {
+   "name": "Sean Kenny",
+   "notation": "0-01",
+   "total": 1
+  },
+  {
+   "name": "Arran Murphy",
+   "notation": "0-01",
+   "total": 1
+  },
+  {
+   "name": "Rory Breslin",
+   "notation": "0-01",
+   "total": 1
+  },
+  {
+   "name": "Daragh Rochford",
+   "notation": "0-01",
+   "total": 1
+  }
+ ],
+ "matchTackles": [
+  {
+   "name": "Conal Butler",
+   "tackles": 6,
+   "frees": 1
+  },
+  {
+   "name": "Daragh Rochford",
+   "tackles": 5,
+   "frees": 2
+  },
+  {
+   "name": "Conor Broderick",
+   "tackles": 5,
+   "frees": 0
+  },
+  {
+   "name": "Des Kelly",
+   "tackles": 3,
+   "frees": 2
+  },
+  {
+   "name": "Ryan Harrison",
+   "tackles": 3,
+   "frees": 0
+  },
+  {
+   "name": "Sam Kearney",
+   "tackles": 2,
+   "frees": 2
+  },
+  {
+   "name": "Arran Murphy",
+   "tackles": 2,
+   "frees": 0
+  },
+  {
+   "name": "Daire Lohan",
+   "tackles": 1,
+   "frees": 1
+  },
+  {
+   "name": "Oscar Harty",
+   "tackles": 1,
+   "frees": 0
+  },
+  {
+   "name": "Rory Breslin",
+   "tackles": 1,
+   "frees": 1
+  },
+  {
+   "name": "Sean Kenny",
+   "tackles": 0,
+   "frees": 1
+  }
+ ],
+ "timeline": [
+  {
+   "m": 1,
+   "h": 2,
+   "a": 0
+  },
+  {
+   "m": 3,
+   "h": 4,
+   "a": 0
+  },
+  {
+   "m": 5,
+   "h": 7,
+   "a": 0
+  },
+  {
+   "m": 7,
+   "h": 7,
+   "a": 3
+  },
+  {
+   "m": 9,
+   "h": 10,
+   "a": 3
+  },
+  {
+   "m": 15,
+   "h": 11,
+   "a": 3
+  },
+  {
+   "m": 16,
+   "h": 11,
+   "a": 4
+  },
+  {
+   "m": 19,
+   "h": 12,
+   "a": 4
+  },
+  {
+   "m": 21,
+   "h": 13,
+   "a": 4
+  },
+  {
+   "m": 23,
+   "h": 13,
+   "a": 7
+  },
+  {
+   "m": 25,
+   "h": 13,
+   "a": 8
+  },
+  {
+   "m": 26,
+   "h": 15,
+   "a": 8
+  },
+  {
+   "m": 30,
+   "h": 16,
+   "a": 8
+  },
+  {
+   "m": 31,
+   "h": 17,
+   "a": 8
+  },
+  {
+   "m": 31,
+   "h": 18,
+   "a": 8
+  },
+  {
+   "m": 34,
+   "h": 20,
+   "a": 8
+  },
+  {
+   "m": 35,
+   "h": 21,
+   "a": 8
+  },
+  {
+   "m": 38,
+   "h": 21,
+   "a": 9
+  },
+  {
+   "m": 41,
+   "h": 24,
+   "a": 9
+  },
+  {
+   "m": 43,
+   "h": 24,
+   "a": 10
+  },
+  {
+   "m": 45,
+   "h": 24,
+   "a": 12
+  },
+  {
+   "m": 49,
+   "h": 24,
+   "a": 15
+  },
+  {
+   "m": 51,
+   "h": 24,
+   "a": 17
+  },
+  {
+   "m": 52,
+   "h": 24,
+   "a": 19
+  },
+  {
+   "m": 58,
+   "h": 25,
+   "a": 19
+  },
+  {
+   "m": 61,
+   "h": 26,
+   "a": 19
+  },
+  {
+   "m": 62,
+   "h": 26,
+   "a": 20
+  }
+ ],
+ "shotsUs": [
+  [
+   0.7323171,
+   0.7024785,
+   "W"
+  ],
+  [
+   0.7368903,
+   0.2524015,
+   "2"
+  ],
+  [
+   0.7734756,
+   0.6569396,
+   "W"
+  ],
+  [
+   0.7144817,
+   0.6637704,
+   "2"
+  ],
+  [
+   0.9431403,
+   0.6060877,
+   "G"
+  ],
+  [
+   0.9120427,
+   0.4482192,
+   "W"
+  ],
+  [
+   0.9426829,
+   0.4945171,
+   "G"
+  ],
+  [
+   0.7131097,
+   0.6463138,
+   "W"
+  ],
+  [
+   0.9440549,
+   0.7518125,
+   "P"
+  ],
+  [
+   0.7400914,
+   0.2774479,
+   "W"
+  ],
+  [
+   0.8118902,
+   0.7017196,
+   "P"
+  ],
+  [
+   0.6879573,
+   0.5355023,
+   "W"
+  ],
+  [
+   0.9115854,
+   0.7214531,
+   "P"
+  ],
+  [
+   0.7323171,
+   0.2599913,
+   "2"
+  ],
+  [
+   0.8196647,
+   0.3131201,
+   "P"
+  ],
+  [
+   0.8182927,
+   0.5074198,
+   "P"
+  ],
+  [
+   0.8855183,
+   0.3051113,
+   "P"
+  ],
+  [
+   0.7332316999999999,
+   0.26564410000000005,
+   "2"
+  ],
+  [
+   0.810061,
+   0.30359329999999995,
+   "P"
+  ],
+  [
+   0.94314024,
+   0.38556349999999995,
+   "G"
+  ],
+  [
+   0.8466463,
+   0.27171599999999996,
+   "W"
+  ],
+  [
+   0.9033536600000001,
+   0.16925330000000005,
+   "W"
+  ],
+  [
+   0.6902439,
+   0.5791042,
+   "W"
+  ],
+  [
+   0.6426829000000001,
+   0.6838439000000001,
+   "W"
+  ],
+  [
+   0.8571645999999999,
+   0.5798632,
+   "P"
+  ],
+  [
+   0.8192073,
+   0.3233269,
+   "W"
+  ],
+  [
+   0.772561,
+   0.41895879999999996,
+   "P"
+  ]
+ ],
+ "shotsOpp": [
+  [
+   0.8699695000000001,
+   0.5487449,
+   "G"
+  ],
+  [
+   0.7972561,
+   0.724829,
+   "W"
+  ],
+  [
+   0.7721037,
+   0.7407676999999999,
+   "W"
+  ],
+  [
+   0.8964939,
+   0.273234,
+   "W"
+  ],
+  [
+   0.8809451,
+   0.7460806,
+   "P"
+  ],
+  [
+   0.93810976,
+   0.3954303,
+   "G"
+  ],
+  [
+   0.8791159,
+   0.5396371,
+   "P"
+  ],
+  [
+   0.7757622,
+   0.7923785,
+   "W"
+  ],
+  [
+   0.9147866,
+   0.6979247,
+   "W"
+  ],
+  [
+   0.7821646,
+   0.318433,
+   "W"
+  ],
+  [
+   0.8539634,
+   0.727525,
+   "P"
+  ],
+  [
+   0.7743902,
+   0.3108432,
+   "P"
+  ],
+  [
+   0.9344512,
+   0.6994426,
+   "W"
+  ],
+  [
+   0.7227134,
+   0.3017354,
+   "2"
+  ],
+  [
+   0.8379573,
+   0.3996442,
+   "W"
+  ],
+  [
+   0.9358231,
+   0.6022928,
+   "G"
+  ],
+  [
+   0.725,
+   0.6979247,
+   "2"
+  ],
+  [
+   0.8759146,
+   0.6296161,
+   "W"
+  ],
+  [
+   0.7378049,
+   0.2546784,
+   "2"
+  ],
+  [
+   0.7217988,
+   0.6182314,
+   "W"
+  ],
+  [
+   0.8681402,
+   0.5575128,
+   "P"
+  ]
+ ],
+ "zonesUs": [
+  {
+   "fromX": 0.764,
+   "toX": 1,
+   "label": "INSIDE D",
+   "n": 17,
+   "pct": 71
+  },
+  {
+   "fromX": 0.714,
+   "toX": 0.764,
+   "label": "D TO ARC",
+   "n": 6,
+   "pct": 67
+  },
+  {
+   "fromX": 0.5,
+   "toX": 0.714,
+   "label": "OUTSIDE 45M",
+   "n": 4,
+   "pct": 0
+  }
+ ],
+ "zonesOpp": [
+  {
+   "fromX": 0.764,
+   "toX": 1,
+   "label": "INSIDE D",
+   "n": 17,
+   "pct": 47
+  },
+  {
+   "fromX": 0.714,
+   "toX": 0.764,
+   "label": "D TO ARC",
+   "n": 4,
+   "pct": 75
+  },
+  {
+   "fromX": 0.5,
+   "toX": 0.714,
+   "label": "OUTSIDE 45M",
+   "n": 0,
+   "pct": 0
+  }
+ ],
+ "kickouts": [
+  [
+   0.416311,
+   0.728284,
+   "W"
+  ],
+  [
+   0.3646342,
+   0.07100447,
+   "W"
+  ],
+  [
+   0.2603658,
+   0.6470728,
+   "W"
+  ],
+  [
+   0.5297256,
+   0.4656758,
+   "L"
+  ],
+  [
+   0.4300305,
+   0.6493497,
+   "W"
+  ],
+  [
+   0.4314024,
+   0.7707871,
+   "W"
+  ],
+  [
+   0.4112805,
+   0.1636004,
+   "W"
+  ],
+  [
+   0.576372,
+   0.1135075,
+   "W"
+  ],
+  [
+   0.7730183,
+   0.8360596,
+   "W"
+  ],
+  [
+   0.5169207,
+   0.4360754,
+   "L"
+  ],
+  [
+   0.5027439,
+   0.772305,
+   "W"
+  ],
+  [
+   0.585061,
+   0.773064,
+   "W"
+  ],
+  [
+   0.4743902,
+   0.1582875,
+   "W"
+  ],
+  [
+   0.4954268,
+   0.7017196,
+   "L"
+  ],
+  [
+   0.5489329,
+   0.6842629,
+   "L"
+  ],
+  [
+   0.5278963,
+   0.6797091,
+   "W"
+  ],
+  [
+   0.6129573,
+   0.7419457,
+   "W"
+  ],
+  [
+   0.4917683,
+   0.546887,
+   "L"
+  ]
+ ],
+ "kogrid": [
+  [
+   {
+    "n": 0,
+    "pct": null
+   },
+   {
+    "n": 0,
+    "pct": null
+   },
+   {
+    "n": 0,
+    "pct": null
+   }
+  ],
+  [
+   {
+    "n": 2,
+    "pct": 100
+   },
+   {
+    "n": 2,
+    "pct": 100
+   },
+   {
+    "n": 2,
+    "pct": 100
+   }
+  ],
+  [
+   {
+    "n": 2,
+    "pct": 100
+   },
+   {
+    "n": 3,
+    "pct": 0
+   },
+   {
+    "n": 7,
+    "pct": 71
+   }
+  ]
+ ],
+ "koWonPct": {
+  "won": 13,
+  "total": 18,
+  "pct": 72
+ },
+ "summary": [
+  "Lightning start: 1-2 inside the first ten minutes (Padraig Doyle x2 goals, Ryan Harrison and Conor Broderick with two-pointers) built a 10-point cushion.",
+  "Cathal Magee was influential throughout \u2014 1-2 from play including the third goal on 41 minutes that re-established a two-score lead.",
+  "Blessington's Player 14 was their key threat (3 scores from play/frees including two 2-pointers in the second half) and kept them in touch late on.",
+  "Conal Butler led the tackle count anchoring the defensive effort, with Daragh Rochford also prominent around the middle third.",
+  "Discipline was an issue in the second half \u2014 Bray conceded the majority of their frees in that period, giving Blessington a route back into the game.",
+  "Kickout retention at 72% (13/18) \u2014 a strong platform that starved Blessington of restart possession.",
+  "Final margin of 6 points reflects a strong platform built early \u2014 managing the second-half free count will be key to closing games out more comfortably."
+ ],
+ "oppKickouts": [
+  [
+   0.5041159,
+   0.2448116,
+   "L"
+  ],
+  [
+   0.4442073,
+   0.5347432,
+   "L"
+  ],
+  [
+   0.5073171,
+   0.1765031,
+   "L"
+  ],
+  [
+   0.5942073,
+   0.7912796,
+   "W"
+  ],
+  [
+   0.6257622,
+   0.2220421,
+   "W"
+  ],
+  [
+   0.5256097,
+   0.1598055,
+   "W"
+  ],
+  [
+   0.6193597,
+   0.7404277,
+   "W"
+  ],
+  [
+   0.6106707,
+   0.7434636,
+   "L"
+  ],
+  [
+   0.6060976,
+   0.7442226,
+   "L"
+  ],
+  [
+   0.5064024,
+   0.1673953,
+   "W"
+  ],
+  [
+   0.4478658,
+   0.1332411,
+   "W"
+  ],
+  [
+   0.4844512,
+   0.0512709,
+   "W"
+  ],
+  [
+   0.1935976,
+   0.8398545,
+   "W"
+  ],
+  [
+   0.2814024,
+   0.7108274,
+   "W"
+  ],
+  [
+   0.2891768,
+   0.3594181,
+   "W"
+  ],
+  [
+   0.4195122,
+   0.1909238,
+   "L"
+  ],
+  [
+   0.4373476,
+   0.6326521,
+   "W"
+  ],
+  [
+   0.4734756,
+   0.6842629,
+   "W"
+  ],
+  [
+   0.5096037,
+   0.6205084,
+   "L"
+  ],
+  [
+   0.3349085,
+   0.7806538,
+   "W"
+  ],
+  [
+   0.4620427,
+   0.637965,
+   "L"
+  ],
+  [
+   0.33125,
+   0.6979247,
+   "W"
+  ],
+  [
+   0.5644817,
+   0.6926118,
+   "W"
+  ]
+ ],
+ "oppKogrid": [
+  [
+   {
+    "n": 0,
+    "pct": null
+   },
+   {
+    "n": 0,
+    "pct": null
+   },
+   {
+    "n": 1,
+    "pct": 100
+   }
+  ],
+  [
+   {
+    "n": 2,
+    "pct": 50
+   },
+   {
+    "n": 3,
+    "pct": 67
+   },
+   {
+    "n": 3,
+    "pct": 100
+   }
+  ],
+  [
+   {
+    "n": 6,
+    "pct": 67
+   },
+   {
+    "n": 2,
+    "pct": 0
+   },
+   {
+    "n": 6,
+    "pct": 67
+   }
+  ]
+ ],
+ "oppKoWonPct": {
+  "won": 15,
+  "total": 23,
+  "pct": 65
+ },
+ "koSpeed": {
+  "us": {
+   "overall": 25.4,
+   "afterWide": 20.7,
+   "afterScore": 28.6,
+   "afterGoal": 25.3,
+   "n": 17
+  },
+  "opp": {
+   "overall": 25.5,
+   "afterWide": 20.6,
+   "afterScore": 28.1,
+   "afterGoal": 29.0,
+   "n": 23
+  }
+ },
+ "possessionLost": {
+  "us": {
+   "In Contact": 3,
+   "Hand Pass": 2,
+   "Shot Short": 1,
+   "Handling": 1,
+   "Kick Pass": 1
+  },
+  "them": {
+   "Hand Pass": 5,
+   "Handling": 3,
+   "Kick Pass": 3,
+   "Shot Short": 1
+  }
+ }
+};</script>
+<script>
+const data = window.__RSA_DATA__;
+const NEON = {green:"#00ff88", red:"#ff3355", purple:"#cc44ff", gold:"#ffdd00"};
+
+document.getElementById('sb-comp').textContent = data.matchMeta.competition + ' · ' + data.matchMeta.date;
+document.getElementById('sb-venue').textContent = data.matchMeta.venue + ' · Referee: ' + data.matchMeta.referee;
+document.getElementById('sb-us-score').textContent = data.scoreLine.us.main;
+document.getElementById('sb-them-score').textContent = data.scoreLine.them.main;
+document.getElementById('sb-us-frees').textContent = 'frees ' + data.scoreLine.us.frees;
+document.getElementById('sb-them-frees').textContent = 'frees ' + data.scoreLine.them.frees;
+const twoPtParts = [];
+if(data.scoreLine.us.twoPt) twoPtParts.push(`Bray ${data.scoreLine.us.twoPt}x2pt`);
+if(data.scoreLine.them.twoPt) twoPtParts.push(`Blessington ${data.scoreLine.them.twoPt}x2pt`);
+document.getElementById('sb-2pt').textContent = twoPtParts.length ? '2-Pointers: ' + twoPtParts.join(' · ') : '';
+const margin = data.scoreLine.margin;
+const banner = document.getElementById('result-banner');
+banner.textContent = margin > 0 ? `WIN by ${margin} point${margin===1?'':'s'}` : margin < 0 ? `LOSS by ${-margin} point${-margin===1?'':'s'}` : 'DRAW';
+if(margin < 0){ banner.style.color='#e04545'; banner.style.background='rgba(224,69,69,0.12)'; banner.style.borderColor='rgba(224,69,69,0.3)'; }
+else if(margin === 0){ banner.style.color='#f0c040'; banner.style.background='rgba(240,192,64,0.12)'; banner.style.borderColor='rgba(240,192,64,0.3)'; }
+
+const compareEl = document.getElementById('compare-stats');
+data.compare.forEach(c=>{
+  const wrap = document.createElement('div');
+  wrap.className='compare-row';
+  const max = Math.max(c.us, c.them, 1);
+  wrap.innerHTML = `
+    <div class="compare-label" style="grid-column:1/-1;">${c.label}</div>
+    <div class="compare-val us">${c.usDisplay !== undefined ? c.usDisplay : c.us}</div>
+    <div class="compare-bar-wrap">
+      <div class="compare-bar-us" style="width:${(c.us/max*50)}%; margin-left:${50-(c.us/max*50)}%;"></div>
+      <div class="compare-bar-them" style="width:${(c.them/max*50)}%;"></div>
+    </div>
+    <div class="compare-val them">${c.themDisplay !== undefined ? c.themDisplay : c.them}</div>
+  `;
+  compareEl.appendChild(wrap);
+});
+
+const matchScorersEl = document.getElementById('match-scorers');
+data.matchScorers.forEach((p,i)=>{
+  const div = document.createElement('div');
+  div.className='lb-row';
+  div.innerHTML = `
+    <div class="lb-rank">${i+1}</div>
+    <div class="lb-name">${p.name}</div>
+    <div class="lb-val">${p.notation}</div>
+  `;
+  matchScorersEl.appendChild(div);
+});
+
+const matchTacklesEl = document.getElementById('match-tackles');
+data.matchTackles.forEach((p,i)=>{
+  const div = document.createElement('div');
+  div.className='lb-row';
+  div.innerHTML = `
+    <div class="lb-rank">${i+1}</div>
+    <div class="lb-name">${p.name}</div>
+    <div class="lb-sub">${p.frees > 0 ? p.frees + ' free' + (p.frees>1?'s':'') + ' conceded' : ''}</div>
+    <div class="lb-val">${p.tackles}</div>
+  `;
+  matchTacklesEl.appendChild(div);
+});
+
+const summaryEl = document.getElementById('ai-summary');
+data.summary.forEach(line=>{
+  const li = document.createElement('li');
+  li.textContent = line;
+  summaryEl.appendChild(li);
+});
+
+function drawTimeline(){
+  const svg = document.getElementById('timeline-svg');
+  const W = 600, H = 220, padL = 36, padR = 16, padT = 16, padB = 30;
+  const matchLen = 60;
+  const maxScore = Math.max(...data.timeline.map(p=>Math.max(p.h,p.a)), 1);
+
+  const x = t => padL + (t/matchLen) * (W - padL - padR);
+  const y = v => H - padB - (v/maxScore) * (H - padT - padB);
+
+  let svgContent = '';
+
+  for(let v=0; v<=maxScore; v += Math.ceil(maxScore/5)){
+    svgContent += `<line x1="${padL}" y1="${y(v)}" x2="${W-padR}" y2="${y(v)}" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>`;
+    svgContent += `<text x="${padL-8}" y="${y(v)+4}" font-size="10" fill="#7a90aa" text-anchor="end">${v}</text>`;
+  }
+
+  svgContent += `<line x1="${x(30)}" y1="${padT}" x2="${x(30)}" y2="${H-padB}" stroke="rgba(255,255,255,0.15)" stroke-width="1" stroke-dasharray="3,3"/>`;
+  svgContent += `<text x="${x(30)}" y="${H-12}" font-size="10" fill="#7a90aa" text-anchor="middle">HT</text>`;
+
+  function buildPath(key, color){
+    let points = [[0,0]];
+    data.timeline.forEach(p=>points.push([p.m, p[key]]));
+    points.push([matchLen, points[points.length-1][1]]);
+    let path = `M ${x(points[0][0])} ${y(points[0][1])}`;
+    for(let i=1;i<points.length;i++){
+      path += ` L ${x(points[i][0])} ${y(points[i-1][1])} L ${x(points[i][0])} ${y(points[i][1])}`;
+    }
+    return `<path d="${path}" fill="none" stroke="${color}" stroke-width="2.5"/>`;
+  }
+  svgContent += buildPath('a', '#7a90aa');
+  svgContent += buildPath('h', '#34c967');
+
+  [0,15,45,60].forEach(t=>{
+    const label = t===60 ? 'FT' : (t===0 ? "0'" : t+"'");
+    svgContent += `<text x="${x(t)}" y="${H-12}" font-size="10" fill="#7a90aa" text-anchor="middle">${label}</text>`;
+  });
+
+  svg.innerHTML = svgContent;
+}
+drawTimeline();
+
+// ---- Possession Lost Donuts ----
+const DONUT_COLORS = ['#34c967','#f0c040','#4a9eff','#cc44ff','#ff3355','#7a90aa'];
+
+function renderDonut(svgEl, legendEl, dataObj){
+  const entries = Object.entries(dataObj);
+  const total = entries.reduce((a,[,v])=>a+v,0);
+  const cx=60, cy=60, r=45, stroke=18;
+  const circumference = 2*Math.PI*r;
+  let offset = 0;
+  let s = '';
+  entries.forEach(([label,val],i)=>{
+    const frac = val/total;
+    const len = frac*circumference;
+    const color = DONUT_COLORS[i % DONUT_COLORS.length];
+    s += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-width="${stroke}" stroke-dasharray="${len} ${circumference-len}" stroke-dashoffset="${-offset}" transform="rotate(-90 ${cx} ${cy})"/>`;
+    offset += len;
+  });
+  s += `<text x="${cx}" y="${cy-2}" fill="#eef2f8" font-size="20" font-weight="900" font-family="monospace" text-anchor="middle">${total}</text>`;
+  s += `<text x="${cx}" y="${cy+13}" fill="#7a90aa" font-size="8" font-family="monospace" text-anchor="middle">TOTAL</text>`;
+  svgEl.innerHTML = s;
+
+  legendEl.innerHTML = '';
+  entries.forEach(([label,val],i)=>{
+    const color = DONUT_COLORS[i % DONUT_COLORS.length];
+    const pct = Math.round(val/total*100);
+    const div = document.createElement('div');
+    div.style.display='flex';
+    div.style.alignItems='center';
+    div.style.gap='6px';
+    div.style.fontSize='0.68rem';
+    div.style.color='var(--text-dim)';
+    div.style.marginBottom='3px';
+    div.innerHTML = `<span style="width:8px;height:8px;border-radius:50%;background:${color};display:inline-block;flex-shrink:0;"></span><span style="flex:1; text-align:left;">${label}</span><span style="color:var(--text); font-weight:700;">${val} (${pct}%)</span>`;
+    legendEl.appendChild(div);
+  });
+}
+
+renderDonut(document.getElementById('donut-us'), document.getElementById('donut-us-legend'), data.possessionLost.us);
+renderDonut(document.getElementById('donut-them'), document.getElementById('donut-them-legend'), data.possessionLost.them);
+
+const C_bg = "#070c18";
+const LN="rgba(255,255,255,0.5)", LN2="rgba(255,255,255,0.28)";
+
+function colFor(mode, code){
+  if(mode==="ko") return code==="W" ? NEON.green : NEON.red;
+  if(code==="G") return NEON.purple;
+  if(code==="P"||code==="2") return NEON.green;
+  return NEON.red;
+}
+
+function renderShotPitch(svgEl, dataPts, zones){
+  const W=240,H=200,L=10,R=230,T=10,B=190,MX=120;
+  const y = f => T + ((1-f)/0.5)*(B-T);
+  const y13=y(0.907), y20=y(0.857), yD=y(0.764), yARC=y(0.714), y45=y(0.679), y65=y(0.536);
+  const SR=15, LR=44;
+
+  let s = '';
+  s += `<rect x="0" y="0" width="${W}" height="${H}" fill="${C_bg}"/>`;
+  s += `<rect x="${L}" y="${T}" width="${R-L}" height="${B-T}" fill="none" stroke="${LN}" stroke-width="2" rx="2"/>`;
+  s += `<line x1="${L}" y1="${B}" x2="${R}" y2="${B}" stroke="${LN2}" stroke-width="1.5" stroke-dasharray="8,5"/>`;
+  s += `<rect x="${MX-SR}" y="${T}" width="${SR*2}" height="12" fill="none" stroke="${LN}" stroke-width="1.2"/>`;
+  s += `<rect x="${MX-LR}" y="${T}" width="${LR*2}" height="${y13-T}" fill="none" stroke="${LN}" stroke-width="1.2"/>`;
+  s += `<line x1="${L}" y1="${y13}" x2="${MX-LR}" y2="${y13}" stroke="${LN2}" stroke-width="1"/>`;
+  s += `<line x1="${MX+LR}" y1="${y13}" x2="${R}" y2="${y13}" stroke="${LN2}" stroke-width="1"/>`;
+  s += `<line x1="${L}" y1="${y20}" x2="${R}" y2="${y20}" stroke="${LN}" stroke-width="1.5"/>`;
+  s += `<line x1="${L}" y1="${y45}" x2="${R}" y2="${y45}" stroke="${LN}" stroke-width="1.2"/>`;
+  s += `<line x1="${L}" y1="${y65}" x2="${R}" y2="${y65}" stroke="${LN2}" stroke-width="1"/>`;
+  s += `<path d="M${L+4},${y13} Q${MX},${2*yARC-y13} ${R-4},${y13}" fill="none" stroke="${LN}" stroke-width="2"/>`;
+  s += `<path d="M${MX-30},${y20} Q${MX},${2*yD-y20} ${MX+30},${y20}" fill="none" stroke="${LN}" stroke-width="1.3"/>`;
+  s += `<line x1="${MX-16}" y1="${T-2}" x2="${MX+16}" y2="${T-2}" stroke="#fff" stroke-width="3" stroke-linecap="round"/>`;
+
+  if(zones){
+    zones.forEach(z=>{
+      const yTop=y(z.toX), yBot=y(z.fromX);
+      const col = z.pct>=60?NEON.green:z.pct>=45?"#ffdd00":NEON.red;
+      s += `<rect x="${L}" y="${yTop}" width="${R-L}" height="${yBot-yTop}" fill="${col}" opacity="0.07"/>`;
+      s += `<line x1="${L}" y1="${yBot}" x2="${R}" y2="${yBot}" stroke="${col}" stroke-width="0.6" opacity="0.4" stroke-dasharray="3,3"/>`;
+      s += `<rect x="${R-58}" y="${yTop+4}" width="52" height="22" rx="4" fill="${C_bg}" opacity="0.85"/>`;
+      s += `<text x="${R-32}" y="${yTop+13}" fill="${col}" font-size="9" font-weight="900" font-family="monospace" text-anchor="middle">${z.pct}%</text>`;
+      s += `<text x="${R-32}" y="${yTop+22}" fill="#7a90aa" font-size="5.5" font-family="monospace" text-anchor="middle">${z.label} · ${z.n}</text>`;
+    });
+  }
+
+  dataPts.forEach(d=>{
+    if(d[0]<0.5) return;
+    const px = L + (d[1]*(R-L));
+    const py = y(d[0]);
+    s += `<circle cx="${px}" cy="${py}" r="3.5" fill="${colFor('shots',d[2])}" opacity="0.7" stroke="rgba(255,255,255,0.3)" stroke-width="0.3"/>`;
+  });
+
+  svgEl.innerHTML = s;
+}
+
+function renderKoPitch(svgEl, dataPts){
+  const W=240,H=360,L=10,R=230,T=10,B=350,MX=120;
+  const yTop = f => T + f*(B-T);
+  const yBot = f => B - f*(B-T);
+  const SR=15, LR=44;
+  const ends = [{e:T, y:yTop, sgn:1}, {e:B, y:yBot, sgn:-1}];
+
+  let s = '';
+  s += `<rect x="0" y="0" width="${W}" height="${H}" fill="${C_bg}"/>`;
+  s += `<rect x="${L}" y="${T}" width="${R-L}" height="${B-T}" fill="none" stroke="${LN}" stroke-width="2" rx="2"/>`;
+  s += `<line x1="${L}" y1="${(T+B)/2}" x2="${R}" y2="${(T+B)/2}" stroke="${LN2}" stroke-width="1.5" stroke-dasharray="8,5"/>`;
+
+  ends.forEach(en=>{
+    const y13=en.y(0.093), y20=en.y(0.143), yD=en.y(0.236), yARC=en.y(0.286), y45=en.y(0.321), y65=en.y(0.464);
+    s += `<rect x="${MX-SR}" y="${Math.min(en.e, en.e+en.sgn*10)}" width="${SR*2}" height="10" fill="none" stroke="${LN}" stroke-width="1"/>`;
+    s += `<rect x="${MX-LR}" y="${Math.min(en.e, y13)}" width="${LR*2}" height="${Math.abs(y13-en.e)}" fill="none" stroke="${LN}" stroke-width="1"/>`;
+    s += `<line x1="${L}" y1="${y13}" x2="${MX-LR}" y2="${y13}" stroke="${LN2}" stroke-width="0.8"/>`;
+    s += `<line x1="${MX+LR}" y1="${y13}" x2="${R}" y2="${y13}" stroke="${LN2}" stroke-width="0.8"/>`;
+    s += `<line x1="${L}" y1="${y20}" x2="${R}" y2="${y20}" stroke="${LN}" stroke-width="1.3"/>`;
+    s += `<line x1="${L}" y1="${y45}" x2="${R}" y2="${y45}" stroke="${LN}" stroke-width="1"/>`;
+    s += `<line x1="${L}" y1="${y65}" x2="${R}" y2="${y65}" stroke="${LN2}" stroke-width="0.8"/>`;
+    s += `<path d="M${L+4},${y13} Q${MX},${2*yARC-y13} ${R-4},${y13}" fill="none" stroke="${LN}" stroke-width="1.6"/>`;
+    s += `<path d="M${MX-26},${y20} Q${MX},${2*yD-y20} ${MX+26},${y20}" fill="none" stroke="${LN}" stroke-width="1.1"/>`;
+    s += `<line x1="${MX-16}" y1="${en.e-en.sgn*2}" x2="${MX+16}" y2="${en.e-en.sgn*2}" stroke="#fff" stroke-width="3" stroke-linecap="round"/>`;
+  });
+
+  dataPts.forEach(d=>{
+    const px = L + (d[1]*(R-L));
+    const py = T + ((1-d[0])*(B-T));
+    s += `<circle cx="${px}" cy="${py}" r="3" fill="${colFor('ko',d[2])}" opacity="0.7" stroke="rgba(255,255,255,0.3)" stroke-width="0.3"/>`;
+  });
+
+  svgEl.innerHTML = s;
+}
+
+const isSc = c => ["P","G","2"].includes(c);
+
+let showZonesShots = true;
+let showZonesOpp = true;
+
+function refreshShots(){
+  const hsScores = data.shotsUs.filter(d=>isSc(d[2])).length;
+  document.getElementById('pm-shots-sub').textContent =
+    `${data.shotsUs.length} SHOTS · ${hsScores} SCORES (${data.shotsUs.length ? Math.round(hsScores/data.shotsUs.length*100) : 0}%)`;
+  renderShotPitch(document.getElementById('pitch-shots-svg'), data.shotsUs, showZonesShots ? data.zonesUs : null);
+  const btn = document.getElementById('zone-toggle-shots');
+  btn.textContent = showZonesShots ? '◉ ZONE CONVERSION ON' : '○ ZONE CONVERSION OFF';
+  btn.classList.toggle('off', !showZonesShots);
+}
+function refreshOpp(){
+  const osScores = data.shotsOpp.filter(d=>isSc(d[2])).length;
+  document.getElementById('pm-opp-sub').textContent =
+    `${data.shotsOpp.length} OPPOSITION SHOTS · ${osScores} CONCEDED (${data.shotsOpp.length ? Math.round(osScores/data.shotsOpp.length*100) : 0}%)`;
+  renderShotPitch(document.getElementById('pitch-opp-svg'), data.shotsOpp, showZonesOpp ? data.zonesOpp : null);
+  const btn = document.getElementById('zone-toggle-opp');
+  btn.textContent = showZonesOpp ? '◉ ZONE CONVERSION ON' : '○ ZONE CONVERSION OFF';
+  btn.classList.toggle('off', !showZonesOpp);
+}
+function refreshKo(){
+  document.getElementById('pm-ko-sub').textContent =
+    `${data.koWonPct.total} OWN KICKOUTS · ${data.koWonPct.won} WON (${data.koWonPct.pct}%)`;
+  renderKoPitch(document.getElementById('pitch-ko-svg'), data.kickouts);
+
+  const grid = document.getElementById('ko-grid');
+  grid.innerHTML = '';
+  grid.appendChild(document.createElement('div'));
+  ["LEFT","CENTRE","RIGHT"].forEach(c=>{
+    const d = document.createElement('div');
+    d.className='colhead'; d.textContent=c;
+    grid.appendChild(d);
+  });
+  ["SHORT","MID","LONG"].forEach((rl,ri)=>{
+    const rh = document.createElement('div');
+    rh.className='rowhead'; rh.textContent=rl;
+    grid.appendChild(rh);
+    data.kogrid[ri].forEach(cell=>{
+      const col = cell.pct===null ? '#7a90aa' : cell.pct>=70 ? NEON.green : cell.pct>=55 ? '#ffdd00' : NEON.red;
+      const div = document.createElement('div');
+      div.className='ko-cell';
+      div.style.borderColor = cell.pct===null ? '#111a2e' : col+'55';
+      div.style.background = cell.pct===null ? '#080f20' : col+'15';
+      div.innerHTML = `<div class="pct" style="color:${col}">${cell.pct===null?'—':cell.pct+'%'}</div><div class="n">${cell.n} KOs</div>`;
+      grid.appendChild(div);
+    });
+  });
+}
+
+function refreshOppKo(){
+  document.getElementById('pm-oppko-sub').textContent =
+    `${data.oppKoWonPct.total} OPPOSITION KICKOUTS · ${data.oppKoWonPct.won} WON (${data.oppKoWonPct.pct}%)`;
+  renderKoPitch(document.getElementById('pitch-oppko-svg'), data.oppKickouts);
+
+  const grid = document.getElementById('oppko-grid');
+  grid.innerHTML = '';
+  grid.appendChild(document.createElement('div'));
+  ["LEFT","CENTRE","RIGHT"].forEach(c=>{
+    const d = document.createElement('div');
+    d.className='colhead'; d.textContent=c;
+    grid.appendChild(d);
+  });
+  ["SHORT","MID","LONG"].forEach((rl,ri)=>{
+    const rh = document.createElement('div');
+    rh.className='rowhead'; rh.textContent=rl;
+    grid.appendChild(rh);
+    data.oppKogrid[ri].forEach(cell=>{
+      const col = cell.pct===null ? '#7a90aa' : cell.pct>=70 ? NEON.green : cell.pct>=55 ? '#ffdd00' : NEON.red;
+      const div = document.createElement('div');
+      div.className='ko-cell';
+      div.style.borderColor = cell.pct===null ? '#111a2e' : col+'55';
+      div.style.background = cell.pct===null ? '#080f20' : col+'15';
+      div.innerHTML = `<div class="pct" style="color:${col}">${cell.pct===null?'—':cell.pct+'%'}</div><div class="n">${cell.n} KOs</div>`;
+      grid.appendChild(div);
+    });
+  });
+}
+
+refreshShots();
+refreshOpp();
+refreshKo();
+refreshOppKo();
+
+// ---- Kickout Speed ----
+const koOverallEl = document.getElementById('ko-speed-overall');
+[
+  {value: data.koSpeed.us.overall+'s', label:'Bray Avg', color:'var(--green)'},
+  {value: data.koSpeed.opp.overall+'s', label:'Blessington Avg', color:'var(--text-dim)'},
+  {value: (data.koSpeed.us.overall - data.koSpeed.opp.overall).toFixed(1)+'s', label:'Difference', color: data.koSpeed.us.overall <= data.koSpeed.opp.overall ? 'var(--green)' : 'var(--red)'}
+].forEach(s=>{
+  const div = document.createElement('div');
+  div.className='stat-box';
+  div.innerHTML = `<div class="num" style="color:${s.color}">${s.value}</div><div class="lbl">${s.label}</div>`;
+  koOverallEl.appendChild(div);
+});
+
+const koBreakdownEl = document.getElementById('ko-speed-breakdown');
+[
+  {label:'After Wide', us:data.koSpeed.us.afterWide, opp:data.koSpeed.opp.afterWide},
+  {label:'After Score', us:data.koSpeed.us.afterScore, opp:data.koSpeed.opp.afterScore},
+  {label:'After Goal', us:data.koSpeed.us.afterGoal, opp:data.koSpeed.opp.afterGoal},
+].forEach(row=>{
+  if(row.us===null && row.opp===null) return;
+  const us = row.us!==null ? row.us : 0;
+  const opp = row.opp!==null ? row.opp : 0;
+  const max = Math.max(us, opp, 1);
+  const div = document.createElement('div');
+  div.className='compare-row';
+  div.innerHTML = `
+    <div class="compare-label" style="grid-column:1/-1;">${row.label}</div>
+    <div class="compare-val us">${row.us!==null ? row.us+'s' : '—'}</div>
+    <div class="compare-bar-wrap">
+      <div class="compare-bar-us" style="width:${(us/max*50)}%; margin-left:${50-(us/max*50)}%;"></div>
+      <div class="compare-bar-them" style="width:${(opp/max*50)}%;"></div>
+    </div>
+    <div class="compare-val them">${row.opp!==null ? row.opp+'s' : '—'}</div>
+  `;
+  koBreakdownEl.appendChild(div);
+});
+
+document.getElementById('zone-toggle-shots').addEventListener('click', ()=>{
+  showZonesShots = !showZonesShots;
+  refreshShots();
+});
+document.getElementById('zone-toggle-opp').addEventListener('click', ()=>{
+  showZonesOpp = !showZonesOpp;
+  refreshOpp();
+});
+
+document.querySelectorAll('.view-tab').forEach(tab=>{
+  tab.addEventListener('click', ()=>{
+    document.querySelectorAll('.view-tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.pmview').forEach(v=>v.style.display='none');
+    tab.classList.add('active');
+    document.getElementById('pm-'+tab.dataset.pmview).style.display='block';
+  });
+});
+</script>
+</body>
+</html>
