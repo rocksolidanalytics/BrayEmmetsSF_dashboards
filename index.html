@@ -148,13 +148,33 @@
   </div>
 
   <div class="card">
-    <div class="card-title">Season Tackle Leaders</div>
-    <div id="season-tackles"></div>
+    <div class="card-title">Player Stats — All League Games</div>
+    <div class="card-sub">SORTED BY TACKLES · MP = MATCHES PLAYED</div>
+    <div style="overflow-x:auto;">
+      <table id="player-table" style="width:100%;border-collapse:collapse;font-size:0.75rem;font-family:monospace;"></table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Tackles — Bray vs Opposition by Match</div>
+    <div id="tackles-by-match"></div>
+    <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-size:0.72rem;color:var(--text-dim);">Season total</span>
+      <div style="display:flex;gap:16px;">
+        <span style="font-size:0.9rem;font-weight:800;color:var(--green);" id="bray-tackle-total"></span>
+        <span style="font-size:0.9rem;font-weight:800;color:var(--text-dim);" id="opp-tackle-total"></span>
+      </div>
+    </div>
   </div>
 
   <div class="card">
     <div class="card-title">Season Team Comparison (vs Amalgamated Opposition)</div>
     <div id="season-compare"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Season Analysis</div>
+    <ul class="summary-list" id="season-commentary"></ul>
   </div>
 
   <div class="card">
@@ -322,6 +342,11 @@
         <div id="donut-m-them-legend" style="margin-top:7px;"></div>
       </div>
     </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Match Analysis</div>
+    <ul class="summary-list" id="latest-commentary"></ul>
   </div>
 
 </section>
@@ -10230,6 +10255,320 @@
    },
    "rawRows": 184
   }
+ ],
+ "playerTable": [
+  {
+   "name": "Sam Kearney",
+   "mp": 6,
+   "tackles": 24,
+   "tacklesPerGame": 4.0,
+   "frees": 4,
+   "score": 0,
+   "g": 0,
+   "p": 0,
+   "2pt": 0,
+   "scorePerGame": 0.0,
+   "notation": "\u2014"
+  },
+  {
+   "name": "Des Kelly",
+   "mp": 6,
+   "tackles": 22,
+   "tacklesPerGame": 3.7,
+   "frees": 6,
+   "score": 14,
+   "g": 0,
+   "p": 6,
+   "2pt": 4,
+   "scorePerGame": 2.3,
+   "notation": "0-06 \u00b7 4x2pt"
+  },
+  {
+   "name": "Ross Hayde",
+   "mp": 5,
+   "tackles": 22,
+   "tacklesPerGame": 4.4,
+   "frees": 5,
+   "score": 4,
+   "g": 0,
+   "p": 4,
+   "2pt": 0,
+   "scorePerGame": 0.8,
+   "notation": "0-04"
+  },
+  {
+   "name": "Conal Butler",
+   "mp": 5,
+   "tackles": 20,
+   "tacklesPerGame": 4.0,
+   "frees": 3,
+   "score": 0,
+   "g": 0,
+   "p": 0,
+   "2pt": 0,
+   "scorePerGame": 0.0,
+   "notation": "\u2014"
+  },
+  {
+   "name": "Daragh Rochford",
+   "mp": 6,
+   "tackles": 19,
+   "tacklesPerGame": 3.2,
+   "frees": 4,
+   "score": 10,
+   "g": 0,
+   "p": 8,
+   "2pt": 1,
+   "scorePerGame": 1.7,
+   "notation": "0-08 \u00b7 1x2pt"
+  },
+  {
+   "name": "Conor Broderick",
+   "mp": 6,
+   "tackles": 18,
+   "tacklesPerGame": 3.0,
+   "frees": 6,
+   "score": 11,
+   "g": 0,
+   "p": 9,
+   "2pt": 1,
+   "scorePerGame": 1.8,
+   "notation": "0-09 \u00b7 1x2pt"
+  },
+  {
+   "name": "Arran Murphy",
+   "mp": 6,
+   "tackles": 18,
+   "tacklesPerGame": 3.0,
+   "frees": 1,
+   "score": 4,
+   "g": 0,
+   "p": 2,
+   "2pt": 1,
+   "scorePerGame": 0.7,
+   "notation": "0-02 \u00b7 1x2pt"
+  },
+  {
+   "name": "Oscar Harty",
+   "mp": 5,
+   "tackles": 18,
+   "tacklesPerGame": 3.6,
+   "frees": 3,
+   "score": 0,
+   "g": 0,
+   "p": 0,
+   "2pt": 0,
+   "scorePerGame": 0.0,
+   "notation": "\u2014"
+  },
+  {
+   "name": "Daire Lohan",
+   "mp": 4,
+   "tackles": 15,
+   "tacklesPerGame": 3.8,
+   "frees": 6,
+   "score": 4,
+   "g": 1,
+   "p": 1,
+   "2pt": 0,
+   "scorePerGame": 1.0,
+   "notation": "1-01"
+  },
+  {
+   "name": "Rory Breslin",
+   "mp": 5,
+   "tackles": 8,
+   "tacklesPerGame": 1.6,
+   "frees": 6,
+   "score": 2,
+   "g": 0,
+   "p": 2,
+   "2pt": 0,
+   "scorePerGame": 0.4,
+   "notation": "0-02"
+  },
+  {
+   "name": "Luke Cotter",
+   "mp": 2,
+   "tackles": 7,
+   "tacklesPerGame": 3.5,
+   "frees": 3,
+   "score": 1,
+   "g": 0,
+   "p": 1,
+   "2pt": 0,
+   "scorePerGame": 0.5,
+   "notation": "0-01"
+  },
+  {
+   "name": "Tim Harrington",
+   "mp": 4,
+   "tackles": 6,
+   "tacklesPerGame": 1.5,
+   "frees": 0,
+   "score": 20,
+   "g": 1,
+   "p": 13,
+   "2pt": 2,
+   "scorePerGame": 5.0,
+   "notation": "1-13 \u00b7 2x2pt"
+  },
+  {
+   "name": "Cathal Magee",
+   "mp": 4,
+   "tackles": 6,
+   "tacklesPerGame": 1.5,
+   "frees": 0,
+   "score": 8,
+   "g": 1,
+   "p": 5,
+   "2pt": 0,
+   "scorePerGame": 2.0,
+   "notation": "1-05"
+  },
+  {
+   "name": "Sean Kenny",
+   "mp": 5,
+   "tackles": 6,
+   "tacklesPerGame": 1.2,
+   "frees": 3,
+   "score": 4,
+   "g": 1,
+   "p": 1,
+   "2pt": 0,
+   "scorePerGame": 0.8,
+   "notation": "1-01"
+  },
+  {
+   "name": "Ryan Harrison",
+   "mp": 3,
+   "tackles": 5,
+   "tacklesPerGame": 1.7,
+   "frees": 0,
+   "score": 18,
+   "g": 0,
+   "p": 8,
+   "2pt": 5,
+   "scorePerGame": 6.0,
+   "notation": "0-08 \u00b7 5x2pt"
+  },
+  {
+   "name": "Brian Nesbitt",
+   "mp": 2,
+   "tackles": 5,
+   "tacklesPerGame": 2.5,
+   "frees": 0,
+   "score": 2,
+   "g": 0,
+   "p": 2,
+   "2pt": 0,
+   "scorePerGame": 1.0,
+   "notation": "0-02"
+  },
+  {
+   "name": "David Martin",
+   "mp": 2,
+   "tackles": 2,
+   "tacklesPerGame": 1.0,
+   "frees": 1,
+   "score": 3,
+   "g": 0,
+   "p": 1,
+   "2pt": 1,
+   "scorePerGame": 1.5,
+   "notation": "0-01 \u00b7 1x2pt"
+  },
+  {
+   "name": "Eanna Hayes",
+   "mp": 3,
+   "tackles": 1,
+   "tacklesPerGame": 0.3,
+   "frees": 1,
+   "score": 5,
+   "g": 1,
+   "p": 2,
+   "2pt": 0,
+   "scorePerGame": 1.7,
+   "notation": "1-02"
+  },
+  {
+   "name": "Nathan Prunty",
+   "mp": 1,
+   "tackles": 1,
+   "tacklesPerGame": 1.0,
+   "frees": 1,
+   "score": 0,
+   "g": 0,
+   "p": 0,
+   "2pt": 0,
+   "scorePerGame": 0.0,
+   "notation": "\u2014"
+  },
+  {
+   "name": "Padraig Doyle",
+   "mp": 1,
+   "tackles": 0,
+   "tacklesPerGame": 0.0,
+   "frees": 0,
+   "score": 6,
+   "g": 2,
+   "p": 0,
+   "2pt": 0,
+   "scorePerGame": 6.0,
+   "notation": "2-00"
+  }
+ ],
+ "oppTacklesByMatch": [
+  {
+   "opp": 20,
+   "rd": 1,
+   "bray": 44
+  },
+  {
+   "opp": 24,
+   "rd": 2,
+   "bray": 47
+  },
+  {
+   "opp": 45,
+   "rd": 3,
+   "bray": 37
+  },
+  {
+   "opp": 32,
+   "rd": 4,
+   "bray": 38
+  },
+  {
+   "opp": 19,
+   "rd": 6,
+   "bray": 42
+  },
+  {
+   "opp": 22,
+   "rd": 8,
+   "bray": 32
+  }
+ ],
+ "brayTacklesSeason": 240,
+ "oppTacklesSeason": 162,
+ "seasonCommentary": [
+  "Bray have outscored their opponents from play by 70 to 39 across 6 tagged games \u2014 almost twice the return. That's the standout number of the season.",
+  "Shooting accuracy sits at 53% versus 45% for opposition \u2014 a meaningful edge, but 46 wides across the season shows there's room to be sharper, particularly from distance.",
+  "The tackle count tells its own story \u2014 Bray have won 240 tackles to the opposition's 162 across 6 games. Sam Kearney (4.0/game) and Ross Hayde (4.4/game) lead the defensive effort.",
+  "Kickout retention is strong \u2014 67/106 of Bray's own restarts won (63%), with the opposition winning only 74/127 (58%) of theirs. Controlling kickouts is directly linked to the two wins over Blessington.",
+  "Tim Harrington is the standout attacker \u2014 20 points from 4 appearances, averaging 5.0 per game. His impact from limited minutes is exceptional.",
+  "The two defeats (\u00c9ire \u00d3g, Baltinglass) both came down to margin: -4 and -2. The scoring platform was there in both games \u2014 the difference was allowing the opposition too many scores from play in the second half.",
+  "Overall scoring difference of +46 points across 8 league rounds (incl. results-only games) reflects a side that scores freely but needs to tighten up when chasing games in the final quarter."
+ ],
+ "latestCommentary": [
+  "A 6-point win that was built in the opening 10 minutes \u2014 two Padraig Doyle goals and a Conor Broderick 2-pointer established early control that Blessington couldn't overturn.",
+  "Bray outscored Blessington from play 13-7 \u2014 the same pattern that's defined the season. When Bray create from open play, they convert at a higher rate.",
+  "Blessington's second-half response (3 goals, 3-pointer) was the concern \u2014 all three goals came from allowing them to carry through the middle. Discipline (15 frees conceded) handed them cheap possession at key moments.",
+  "Kickout dominance \u2014 Bray won 72% of their own restarts while restricting Blessington to 65%. Controlling kickouts is becoming a hallmark of big wins.",
+  "Bray restarted in an average of 25.4s \u2014 quicker than the season average of 25.7s. Fastest restart of the game was 13s, slowest 55s.",
+  "Cathal Magee and Padraig Doyle were central to everything going forward \u2014 between them they drove both the scoring and the pressure that forced Blessington turnovers.",
+  "The 54% possession share wasn't dominant, but Bray used it better \u2014 27 shots (59% accuracy) versus 21 for Blessington (52%). Quality over quantity."
  ]
 };</script>
 <script>
@@ -10272,13 +10611,80 @@ D.seasonScorers.slice(0,12).forEach((p,i)=>{
   ssl.appendChild(d);
 });
 
-// ---- SEASON TACKLES ----
-const stl=document.getElementById('season-tackles');
-D.seasonTackles.slice(0,10).forEach((p,i)=>{
-  const d=document.createElement('div'); d.className='lb-row';
-  d.innerHTML=`<div class="lb-rank">${i+1}</div><div class="lb-name">${p.name}</div><div class="lb-sub">${p.frees>0?p.frees+' free'+(p.frees>1?'s':'')+' conceded':''}</div><div class="lb-val">${p.tackles}</div>`;
-  stl.appendChild(d);
+// ---- PLAYER STATS TABLE ----
+const ptable = document.getElementById('player-table');
+const thStyle = 'padding:6px 8px;text-align:right;font-size:0.62rem;color:var(--text-dim);border-bottom:2px solid var(--border);white-space:nowrap;';
+const thStyleL = 'padding:6px 8px;text-align:left;font-size:0.62rem;color:var(--text-dim);border-bottom:2px solid var(--border);';
+ptable.innerHTML = `<thead><tr>
+  <th style="${thStyleL}">Player</th>
+  <th style="${thStyle}">MP</th>
+  <th style="${thStyle}">T</th>
+  <th style="${thStyle}">T/G</th>
+  <th style="${thStyle}">FC</th>
+  <th style="${thStyle}">Sc</th>
+  <th style="${thStyle}">Sc/G</th>
+</tr></thead><tbody id="player-table-body"></tbody>`;
+const ptbody = document.getElementById('player-table-body');
+D.playerTable.forEach((p,i)=>{
+  const tr = document.createElement('tr');
+  tr.style.borderBottom = '1px solid var(--border)';
+  const tdS = 'padding:7px 8px;text-align:right;font-variant-numeric:tabular-nums;';
+  const highT = p.tacklesPerGame >= 3.5;
+  const highSc = p.scorePerGame >= 2;
+  tr.innerHTML = `
+    <td style="padding:7px 8px;font-weight:600;font-size:0.78rem;">${p.name}</td>
+    <td style="${tdS}font-size:0.72rem;color:var(--text-dim);">${p.mp}</td>
+    <td style="${tdS}font-weight:800;color:var(--green);">${p.tackles}</td>
+    <td style="${tdS}font-size:0.72rem;color:${highT?'var(--green)':'var(--text-dim)'};">${p.tacklesPerGame}</td>
+    <td style="${tdS}font-size:0.72rem;color:${p.frees>=5?'var(--red)':'var(--text-dim)'};">${p.frees}</td>
+    <td style="${tdS}font-weight:${p.score>0?700:400};color:${p.score>0?'var(--text)':'var(--text-dim)'};">${p.score||'—'}</td>
+    <td style="${tdS}font-size:0.72rem;color:${highSc?'var(--gold)':'var(--text-dim)'};">${p.score>0?p.scorePerGame:'—'}</td>`;
+  ptbody.appendChild(tr);
 });
+// Table legend
+const tleg = document.createElement('div');
+tleg.style.cssText='font-size:0.65rem;color:var(--text-dim);margin-top:8px;display:flex;gap:12px;flex-wrap:wrap;';
+tleg.innerHTML=`<span>T = Tackles · T/G = Per game · FC = Frees conceded · Sc = Score pts · Sc/G = Per game</span>`;
+document.getElementById('player-table').parentElement.parentElement.appendChild(tleg);
+
+// ---- TACKLES BY MATCH ----
+const tbmEl = document.getElementById('tackles-by-match');
+D.oppTacklesByMatch.forEach(m=>{
+  const max = Math.max(m.bray, m.opp, 1);
+  const div = document.createElement('div');
+  div.style.cssText='padding:8px 0;border-bottom:1px solid var(--border);';
+  div.innerHTML=`<div style="font-size:0.68rem;font-family:monospace;color:var(--text-dim);margin-bottom:5px;">RD${m.rd} ${m.opp.toUpperCase()}</div>
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
+      <span style="width:36px;font-size:0.62rem;color:var(--green);font-family:monospace;">BRAY</span>
+      <div style="flex:1;height:8px;background:rgba(255,255,255,0.05);border-radius:3px;overflow:hidden;">
+        <div style="width:${m.bray/max*100}%;height:100%;background:var(--green);opacity:0.8;border-radius:3px;"></div>
+      </div>
+      <span style="width:24px;text-align:right;font-size:0.75rem;font-weight:800;color:var(--green);">${m.bray}</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;">
+      <span style="width:36px;font-size:0.62rem;color:var(--text-dim);font-family:monospace;">OPP</span>
+      <div style="flex:1;height:8px;background:rgba(255,255,255,0.05);border-radius:3px;overflow:hidden;">
+        <div style="width:${m.opp/max*100}%;height:100%;background:var(--text-dim);opacity:0.5;border-radius:3px;"></div>
+      </div>
+      <span style="width:24px;text-align:right;font-size:0.75rem;font-weight:800;color:var(--text-dim);">${m.opp}</span>
+    </div>`;
+  tbmEl.appendChild(div);
+});
+document.getElementById('bray-tackle-total').textContent = `Bray ${D.brayTacklesSeason}`;
+document.getElementById('opp-tackle-total').textContent = `Opp ${D.oppTacklesSeason}`;
+
+// ---- COMMENTARY ----
+const scEl = document.getElementById('season-commentary');
+D.seasonCommentary.forEach(line=>{
+  const li = document.createElement('li'); li.textContent = line; scEl.appendChild(li);
+});
+const lcEl = document.getElementById('latest-commentary');
+D.latestCommentary.forEach(line=>{
+  const li = document.createElement('li'); li.textContent = line; lcEl.appendChild(li);
+});
+
+// ---- SEASON TACKLES (old element no longer in HTML — skip) ----
+
 
 // ---- COMPARE BARS ----
 function renderCompare(el, data){
