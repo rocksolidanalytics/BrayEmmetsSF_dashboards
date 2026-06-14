@@ -166,6 +166,14 @@
   </div>
 
   <div class="card">
+    <div class="card-title">Scoring by 10-Minute Period — Season</div>
+    <div class="card-sub">Points scored per period across all tagged games</div>
+    <svg id="period-season-svg" viewBox="0 0 600 220" style="width:100%;display:block;" preserveAspectRatio="xMidYMid meet"></svg>
+    <div class="legend"><span><i class="dot" style="background:var(--green)"></i>Bray Emmets</span><span><i class="dot" style="background:var(--text-dim)"></i>Opposition</span></div>
+    <div class="note" id="period-season-insight"></div>
+  </div>
+
+  <div class="card">
     <div class="card-title">Season Team Comparison (vs Amalgamated Opposition)</div>
     <div id="season-compare"></div>
   </div>
@@ -311,6 +319,13 @@
     </div>
   </div>
 
+
+  <div class="card">
+    <div class="card-title">Scoring by 10-Minute Period</div>
+    <div class="card-sub">Points scored per period — this match</div>
+    <svg id="period-match-svg" viewBox="0 0 600 220" style="width:100%;display:block;" preserveAspectRatio="xMidYMid meet"></svg>
+    <div class="legend"><span><i class="dot" style="background:var(--green)"></i>Bray Emmets</span><span><i class="dot" style="background:var(--text-dim)" id="period-opp-label"></i></span></div>
+  </div>
 
   <div class="card">
     <div class="card-title">Scorers</div>
@@ -4520,7 +4535,25 @@
    "afterScore": 28.1,
    "n": 23
   },
-  "rawRows": 184
+  "rawRows": 184,
+  "periodScoring": {
+   "bray": [
+    10,
+    2,
+    3,
+    6,
+    3,
+    1
+   ],
+   "opp": [
+    3,
+    1,
+    4,
+    1,
+    6,
+    4
+   ]
+  }
  },
  "allMatches": [
   {
@@ -10615,6 +10648,32 @@
    "slow": ">26s"
   },
   "totalKOs": 104
+ },
+ "periodScoring": {
+  "labels": [
+   "0-10",
+   "10-20",
+   "20-30",
+   "30-40",
+   "40-50",
+   "50-60"
+  ],
+  "seasonBray": [
+   22,
+   10,
+   20,
+   22,
+   21,
+   20
+  ],
+  "seasonOpp": [
+   7,
+   7,
+   12,
+   22,
+   18,
+   8
+  ]
  }
 };</script>
 <script>
@@ -10990,6 +11049,71 @@ speedLabels.forEach((c,i)=>{
 });
 document.getElementById('ko-matrix-insight').textContent =
   'Short kickouts win regardless of speed (80-100%). Mid-range kickouts are the key battleground — fast mid-range wins 70%, slow drops to 50%. Going long is a coin flip either way.';
+
+// ---- PERIOD SCORING CHARTS ----
+function renderPeriodChart(svgId, bray, opp, labels){
+  const svg=document.getElementById(svgId);
+  const W=600,H=220,pL=40,pR=16,pT=20,pB=36;
+  const n=labels.length;
+  const maxV=Math.max(...bray,...opp,1);
+  const barW=((W-pL-pR)/n)*0.35;
+  const gap=4;
+  let s='';
+
+  // Gridlines
+  for(let v=0;v<=maxV;v+=Math.ceil(maxV/4)){
+    const yy=H-pB-(v/maxV)*(H-pT-pB);
+    s+=`<line x1="${pL}" y1="${yy}" x2="${W-pR}" y2="${yy}" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>`;
+    s+=`<text x="${pL-6}" y="${yy+4}" font-size="9" fill="#7a90aa" text-anchor="end" font-family="monospace">${v}</text>`;
+  }
+
+  // HT marker
+  const htX=pL+(3/n)*(W-pL-pR);
+  s+=`<line x1="${htX}" y1="${pT}" x2="${htX}" y2="${H-pB}" stroke="rgba(255,255,255,0.15)" stroke-width="1" stroke-dasharray="3,3"/>`;
+  s+=`<text x="${htX}" y="${H-pB+14}" font-size="8" fill="#7a90aa" text-anchor="middle" font-family="monospace">HT</text>`;
+
+  labels.forEach((lbl,i)=>{
+    const cx=pL+((i+0.5)/n)*(W-pL-pR);
+    const bH=(bray[i]/maxV)*(H-pT-pB);
+    const oH=(opp[i]/maxV)*(H-pT-pB);
+    const bY=H-pB-bH;
+    const oY=H-pB-oH;
+    const diff=bray[i]-opp[i];
+
+    // Bray bar (left)
+    s+=`<rect x="${cx-barW-gap/2}" y="${bY}" width="${barW}" height="${bH}" fill="#34c967" rx="3" opacity="0.85"/>`;
+    if(bray[i]>0) s+=`<text x="${cx-barW/2-gap/2}" y="${bY-4}" font-size="9" fill="#34c967" text-anchor="middle" font-family="monospace" font-weight="800">${bray[i]}</text>`;
+
+    // Opp bar (right)
+    s+=`<rect x="${cx+gap/2}" y="${oY}" width="${barW}" height="${oH}" fill="#7a90aa" rx="3" opacity="0.5"/>`;
+    if(opp[i]>0) s+=`<text x="${cx+barW/2+gap/2}" y="${oY-4}" font-size="9" fill="#7a90aa" text-anchor="middle" font-family="monospace" font-weight="800">${opp[i]}</text>`;
+
+    // Diff indicator
+    const diffCol=diff>0?'#34c967':diff<0?'#e04545':'#7a90aa';
+    const diffStr=diff>0?'+'+diff:diff===0?'0':''+diff;
+    s+=`<text x="${cx}" y="${H-pB+14}" font-size="8" fill="${diffCol}" text-anchor="middle" font-family="monospace" font-weight="700">${diffStr}</text>`;
+
+    // Period label
+    s+=`<text x="${cx}" y="${H-4}" font-size="8" fill="#7a90aa" text-anchor="middle" font-family="monospace">${lbl}</text>`;
+  });
+
+  svg.innerHTML=s;
+}
+
+const ps=D.periodScoring;
+renderPeriodChart('period-season-svg', ps.seasonBray, ps.seasonOpp, ps.labels);
+
+// Insight
+const diffs=ps.labels.map((_,i)=>ps.seasonBray[i]-ps.seasonOpp[i]);
+const bestIdx=diffs.indexOf(Math.max(...diffs));
+const worstIdx=diffs.indexOf(Math.min(...diffs));
+document.getElementById('period-season-insight').textContent=
+  `Strongest period: ${ps.labels[bestIdx]} (Bray +${diffs[bestIdx]}). Weakest: ${ps.labels[worstIdx]} (${diffs[worstIdx]>=0?'+':''}${diffs[worstIdx]}). The first 10 minutes of the second half (30-40) is where Bray's dominance disappears — level on 22-22 across the season.`;
+
+// Latest match period chart
+const lps=LM.periodScoring;
+renderPeriodChart('period-match-svg', lps.bray, lps.opp, ps.labels);
+document.getElementById('period-opp-label').textContent=LM.meta.opp;
 
 // ---- DONUTS ----
 const DC=['#34c967','#f0c040','#4a9eff','#cc44ff','#ff3355','#7a90aa','#ff8800'];
