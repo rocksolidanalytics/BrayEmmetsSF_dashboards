@@ -226,11 +226,6 @@
   </div>
 
   <div class="card">
-    <div class="card-title">Kickout Speed by Match</div>
-    <div id="ko-speed-by-match"></div>
-  </div>
-
-  <div class="card">
     <div class="card-title">Season Possession Lost</div>
     <div class="card-sub">Why the ball was given away across all games</div>
     <div style="display:flex;gap:8px;">
@@ -316,11 +311,6 @@
     </div>
   </div>
 
-  <div class="card">
-    <div class="card-title">Kickout Speed — This Match vs League Avg</div>
-    <div class="card-sub">Fastest · Average · Slowest — vs Bray season avg and opposition season avg</div>
-    <div id="ko-speed-match"></div>
-  </div>
 
   <div class="card">
     <div class="card-title">Scorers</div>
@@ -356,7 +346,7 @@
 
 </section>
 </main>
-<footer>Rock Solid Analytics · Bray Emmets GAA · 2026 <!-- v1781405545 --></footer>
+<footer>Rock Solid Analytics · Bray Emmets GAA · 2026</footer>
 
 <script>window.__RSA__ = {
  "resultsTable": [
@@ -3558,74 +3548,12 @@
  },
  "leagueKoSpeed": {
   "brayAvg": 25.7,
-  "brayFastest": 9,
-  "braySlowest": 88,
+  "brayP10": 14,
+  "brayP90": 36,
   "oppAvg": 26.2,
-  "oppFastest": 12,
-  "oppSlowest": 68
+  "oppP10": 16,
+  "oppP90": 41
  },
- "koSpeedByMatch": [
-  {
-   "opp": "Carnew Emmets",
-   "rd": 1,
-   "brayAvg": 26.3,
-   "brayFastest": 12,
-   "braySlowest": 62,
-   "oppAvg": 26.9,
-   "oppFastest": 18,
-   "oppSlowest": 61
-  },
-  {
-   "opp": "Rathnew",
-   "rd": 2,
-   "brayAvg": 23.4,
-   "brayFastest": 11,
-   "braySlowest": 54,
-   "oppAvg": 24.2,
-   "oppFastest": 12,
-   "oppSlowest": 59
-  },
-  {
-   "opp": "Blessington",
-   "rd": 3,
-   "brayAvg": 30.1,
-   "brayFastest": 10,
-   "braySlowest": 88,
-   "oppAvg": 24.4,
-   "oppFastest": 16,
-   "oppSlowest": 39
-  },
-  {
-   "opp": "\u00c9ire \u00d3g",
-   "rd": 4,
-   "brayAvg": 23.4,
-   "brayFastest": 14,
-   "braySlowest": 62,
-   "oppAvg": 33.1,
-   "oppFastest": 20,
-   "oppSlowest": 65
-  },
-  {
-   "opp": "Baltinglass",
-   "rd": 6,
-   "brayAvg": 26.0,
-   "brayFastest": 9,
-   "braySlowest": 75,
-   "oppAvg": 24.3,
-   "oppFastest": 15,
-   "oppSlowest": 41
-  },
-  {
-   "opp": "Blessington",
-   "rd": 8,
-   "brayAvg": 25.4,
-   "brayFastest": 13,
-   "braySlowest": 55,
-   "oppAvg": 25.5,
-   "oppFastest": 15,
-   "oppSlowest": 68
-  }
- ],
  "latestMatch": {
   "meta": {
    "date": "12 Jun 2026",
@@ -10996,80 +10924,43 @@ document.querySelectorAll('.view-tab').forEach(tab=>{
 });
 
 // ---- KO SPEED ----
-function renderKoSpeed(el, rows){
-  // rows: [{label, bray, brayLeagueAvg, opp, oppLeagueAvg, fastest_b, slowest_b, fastest_o, slowest_o}]
-  rows.forEach(row=>{
-    const wrap=document.createElement('div'); wrap.style.marginBottom='14px';
-    const lbl=document.createElement('div');
-    lbl.style.cssText='font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-dim);font-weight:700;margin-bottom:6px;font-family:monospace;';
-    lbl.textContent=row.label;
-    wrap.appendChild(lbl);
-    // Bray row
-    if(row.bray!==null){
-      const bRow=document.createElement('div'); bRow.style.cssText='display:flex;align-items:center;gap:8px;margin-bottom:4px;';
-      const bLbl=document.createElement('div'); bLbl.style.cssText='width:52px;font-size:0.65rem;color:var(--green);font-family:monospace;font-weight:700;flex-shrink:0;'; bLbl.textContent='BRAY';
-      const bBar=document.createElement('div'); bBar.style.cssText='flex:1;position:relative;height:22px;background:rgba(255,255,255,0.05);border-radius:5px;overflow:visible;';
-      const max=row.slowest_b||60;
-      const min_v=row.fastest_b||5;
-      const pct_f=Math.max(0,(min_v/max)*100); const pct_a=(row.bray/max)*100; const pct_s=100;
-      bBar.innerHTML=`<div style="position:absolute;left:${pct_f}%;right:${100-pct_s}%;top:0;bottom:0;background:rgba(52,201,103,0.15);border-radius:5px;"></div>
-        <div style="position:absolute;left:${pct_a}%;top:-3px;bottom:-3px;width:3px;background:#34c967;border-radius:2px;"></div>
-        <div style="position:absolute;left:${pct_f}%;top:-3px;bottom:-3px;width:2px;background:rgba(52,201,103,0.5);border-radius:1px;"></div>
-        <div style="position:absolute;right:0;top:-3px;bottom:-3px;width:2px;background:rgba(52,201,103,0.3);border-radius:1px;"></div>
-        <span style="position:absolute;left:${pct_f}%;top:50%;transform:translate(-50%,-50%);font-size:0.55rem;color:#34c967;font-family:monospace;">${min_v}s</span>
-        <span style="position:absolute;left:${pct_a}%;top:50%;transform:translate(-120%,-50%);font-size:0.6rem;color:#34c967;font-family:monospace;font-weight:900;">${row.bray}s</span>
-        <span style="position:absolute;right:4px;top:50%;transform:translateY(-50%);font-size:0.55rem;color:rgba(52,201,103,0.6);font-family:monospace;">${max}s</span>`;
-      if(row.brayLeagueAvg!==null && row.brayLeagueAvg!==row.bray){
-        const pct_la=(row.brayLeagueAvg/max)*100;
-        bBar.innerHTML+=`<div style="position:absolute;left:${pct_la}%;top:-3px;bottom:-3px;width:2px;background:#7a90aa;border-radius:1px;opacity:0.6;" title="League avg"></div>`;
-      }
-      bRow.appendChild(bLbl); bRow.appendChild(bBar); wrap.appendChild(bRow);
-    }
-    // Opp row
-    if(row.opp!==null){
-      const oRow=document.createElement('div'); oRow.style.cssText='display:flex;align-items:center;gap:8px;';
-      const oLbl=document.createElement('div'); oLbl.style.cssText='width:52px;font-size:0.65rem;color:var(--text-dim);font-family:monospace;font-weight:700;flex-shrink:0;'; oLbl.textContent='OPP';
-      const oBar=document.createElement('div'); oBar.style.cssText='flex:1;position:relative;height:22px;background:rgba(255,255,255,0.05);border-radius:5px;overflow:visible;';
-      const max=row.slowest_o||60;
-      const min_v=row.fastest_o||5;
-      const pct_f=Math.max(0,(min_v/max)*100); const pct_a=(row.opp/max)*100;
-      oBar.innerHTML=`<div style="position:absolute;left:${pct_f}%;right:0;top:0;bottom:0;background:rgba(122,144,170,0.1);border-radius:5px;"></div>
-        <div style="position:absolute;left:${pct_a}%;top:-3px;bottom:-3px;width:3px;background:#7a90aa;border-radius:2px;"></div>
-        <div style="position:absolute;left:${pct_f}%;top:-3px;bottom:-3px;width:2px;background:rgba(122,144,170,0.4);border-radius:1px;"></div>
-        <div style="position:absolute;right:0;top:-3px;bottom:-3px;width:2px;background:rgba(122,144,170,0.2);border-radius:1px;"></div>
-        <span style="position:absolute;left:${pct_f}%;top:50%;transform:translate(-50%,-50%);font-size:0.55rem;color:#7a90aa;font-family:monospace;">${min_v}s</span>
-        <span style="position:absolute;left:${pct_a}%;top:50%;transform:translate(-120%,-50%);font-size:0.6rem;color:#7a90aa;font-family:monospace;font-weight:900;">${row.opp}s</span>
-        <span style="position:absolute;right:4px;top:50%;transform:translateY(-50%);font-size:0.55rem;color:rgba(122,144,170,0.5);font-family:monospace;">${max}s</span>`;
-      if(row.oppLeagueAvg!==null && row.oppLeagueAvg!==row.opp){
-        const pct_la=(row.oppLeagueAvg/max)*100;
-        oBar.innerHTML+=`<div style="position:absolute;left:${pct_la}%;top:-3px;bottom:-3px;width:2px;background:#7a90aa;border-radius:1px;opacity:0.4;" title="League avg"></div>`;
-      }
-      oRow.appendChild(oLbl); oRow.appendChild(oBar); wrap.appendChild(oRow);
-    }
-    el.appendChild(wrap);
-  });
+// ---- KO SPEED SEASON (p10 / avg / p90) ----
+const lks = D.leagueKoSpeed;
+const ksEl = document.getElementById('ko-speed-season');
+const maxT = Math.max(lks.brayP90, lks.oppP90, 50);
 
-  // Legend
-  const leg=document.createElement('div'); leg.className='legend'; leg.style.marginTop='10px';
-  leg.innerHTML=`<span><span style="display:inline-block;width:10px;height:3px;background:#34c967;border-radius:1px;vertical-align:middle;"></span> Bray avg</span>
-    <span><span style="display:inline-block;width:10px;height:3px;background:#7a90aa;opacity:0.6;border-radius:1px;vertical-align:middle;"></span> League avg</span>
-    <span style="font-size:0.65rem;color:var(--text-dim);">Bars show fastest → slowest range</span>`;
-  el.appendChild(leg);
+function renderSpeedRow(el, label, color, p10, avg, p90) {
+  const row = document.createElement('div');
+  row.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:8px;';
+  const lbl = document.createElement('div');
+  lbl.style.cssText = `width:52px;font-size:0.65rem;color:${color};font-family:monospace;font-weight:700;flex-shrink:0;`;
+  lbl.textContent = label;
+  const bar = document.createElement('div');
+  bar.style.cssText = 'flex:1;position:relative;height:26px;background:rgba(255,255,255,0.05);border-radius:6px;';
+  const pctL = (p10/maxT*100);
+  const pctR = (p90/maxT*100);
+  const pctA = (avg/maxT*100);
+  bar.innerHTML = `
+    <div style="position:absolute;left:${pctL}%;right:${100-pctR}%;top:3px;bottom:3px;background:${color};opacity:0.15;border-radius:4px;"></div>
+    <div style="position:absolute;left:${pctL}%;top:0;bottom:0;width:2px;background:${color};opacity:0.5;border-radius:1px;"></div>
+    <div style="position:absolute;left:${pctR}%;top:0;bottom:0;width:2px;background:${color};opacity:0.5;border-radius:1px;"></div>
+    <div style="position:absolute;left:${pctA}%;top:-2px;bottom:-2px;width:3px;background:${color};border-radius:2px;"></div>
+    <span style="position:absolute;left:${pctL-1}%;top:50%;transform:translate(-100%,-50%);font-size:0.6rem;color:${color};font-family:monospace;font-weight:700;">${p10}s</span>
+    <span style="position:absolute;left:${pctA}%;top:50%;transform:translate(-50%,-160%);font-size:0.65rem;color:${color};font-family:monospace;font-weight:900;">${avg}s</span>
+    <span style="position:absolute;left:${pctR+1}%;top:50%;transform:translate(0%,-50%);font-size:0.6rem;color:${color};font-family:monospace;font-weight:700;">${p90}s</span>`;
+  row.appendChild(lbl);
+  row.appendChild(bar);
+  el.appendChild(row);
 }
 
-// Season KO speed
-const lks=D.leagueKoSpeed;
-renderKoSpeed(document.getElementById('ko-speed-season'),[
-  {label:'Overall', bray:lks.brayAvg, brayLeagueAvg:null, opp:lks.oppAvg, oppLeagueAvg:null, fastest_b:lks.brayFastest, slowest_b:lks.braySlowest, fastest_o:lks.oppFastest, slowest_o:lks.oppSlowest},
-]);
+renderSpeedRow(ksEl, 'BRAY', '#34c967', lks.brayP10, lks.brayAvg, lks.brayP90);
+renderSpeedRow(ksEl, 'OPP', '#7a90aa', lks.oppP10, lks.oppAvg, lks.oppP90);
 
-// Match KO speed vs league avg
-const mks=LM.koSpeedUs, mko=LM.koSpeedOpp;
-renderKoSpeed(document.getElementById('ko-speed-match'),[
-  {label:'Overall', bray:mks?mks.overall:null, brayLeagueAvg:lks.brayAvg, opp:mko?mko.overall:null, oppLeagueAvg:lks.oppAvg, fastest_b:mks?mks.fastest:null, slowest_b:mks?mks.slowest:null, fastest_o:mko?mko.fastest:null, slowest_o:mko?mko.slowest:null},
-  {label:'After Wide', bray:mks?mks.afterWide:null, brayLeagueAvg:null, opp:mko?mko.afterWide:null, oppLeagueAvg:null, fastest_b:null, slowest_b:null, fastest_o:null, slowest_o:null},
-  {label:'After Score', bray:mks?mks.afterScore:null, brayLeagueAvg:null, opp:mko?mko.afterScore:null, oppLeagueAvg:null, fastest_b:null, slowest_b:null, fastest_o:null, slowest_o:null},
-]);
+const ksLeg = document.createElement('div');
+ksLeg.className = 'legend';
+ksLeg.style.marginTop = '8px';
+ksLeg.innerHTML = '<span style="font-size:0.62rem;">Shaded = 10th–90th percentile range · Bar = average</span>';
+ksEl.appendChild(ksLeg);
 
 // ---- KO MATRIX (Distance x Speed) ----
 const kmEl = document.getElementById('ko-matrix');
@@ -11101,33 +10992,6 @@ speedLabels.forEach((c,i)=>{
 });
 document.getElementById('ko-matrix-insight').textContent =
   'Short kickouts win regardless of speed (80-100%). Mid-range kickouts are the key battleground — fast mid-range wins 70%, slow drops to 50%. Going long is a coin flip either way.';
-
-// ---- KO SPEED BY MATCH ----
-const kmbEl=document.getElementById('ko-speed-by-match');
-D.koSpeedByMatch.forEach(m=>{
-  const div=document.createElement('div'); div.style.cssText='display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);font-size:0.78rem;';
-  const max_t=70;
-  const bAvg=m.brayAvg||0, oAvg=m.oppAvg||0;
-  div.innerHTML=`<div style="width:90px;font-weight:600;flex-shrink:0;">Rd${m.rd} ${m.opp}</div>
-    <div style="flex:1;">
-      <div style="display:flex;align-items:center;gap:4px;margin-bottom:3px;">
-        <span style="width:36px;font-size:0.6rem;color:var(--green);font-family:monospace;">BRAY</span>
-        <div style="flex:1;height:7px;background:rgba(255,255,255,0.05);border-radius:3px;position:relative;">
-          <div style="position:absolute;left:0;top:0;bottom:0;width:${bAvg/max_t*100}%;background:var(--green);border-radius:3px;opacity:0.7;"></div>
-        </div>
-        <span style="width:28px;text-align:right;font-size:0.7rem;color:var(--green);font-family:monospace;">${bAvg}s</span>
-      </div>
-      <div style="display:flex;align-items:center;gap:4px;">
-        <span style="width:36px;font-size:0.6rem;color:var(--text-dim);font-family:monospace;">OPP</span>
-        <div style="flex:1;height:7px;background:rgba(255,255,255,0.05);border-radius:3px;position:relative;">
-          <div style="position:absolute;left:0;top:0;bottom:0;width:${oAvg/max_t*100}%;background:var(--text-dim);border-radius:3px;opacity:0.5;"></div>
-        </div>
-        <span style="width:28px;text-align:right;font-size:0.7rem;color:var(--text-dim);font-family:monospace;">${oAvg}s</span>
-      </div>
-    </div>
-    <div style="text-align:right;flex-shrink:0;min-width:60px;font-size:0.65rem;color:var(--text-dim);">⚡${m.brayFastest||'?'}s / 🐢${m.braySlowest||'?'}s</div>`;
-  kmbEl.appendChild(div);
-});
 
 // ---- DONUTS ----
 const DC=['#34c967','#f0c040','#4a9eff','#cc44ff','#ff3355','#7a90aa','#ff8800'];
