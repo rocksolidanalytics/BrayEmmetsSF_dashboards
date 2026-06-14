@@ -10691,6 +10691,8 @@ const D = window.__RSA__;
 const LM = D.latestMatch;
 const NEON = {green:"#00ff88",red:"#ff3355",purple:"#cc44ff",gold:"#ffdd00"};
 const C_bg="#070c18", LN="rgba(255,255,255,0.5)", LN2="rgba(255,255,255,0.28)";
+const isSc=c=>["P","G","2"].includes(c);
+const zoneState={};
 
 // ---- TABS ----
 document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
@@ -11123,9 +11125,7 @@ function renderKoGrid(el,grid){
   });
 }
 
-const isSc=c=>["P","G","2"].includes(c);
 // Setup pitch map toggles
-const zoneState={};
 function setupPitchMap(prefix, ptsUs, ptsOpp, zonesUs, zonesOpp, koUs, koOpp, koGridUs, koGridOpp, koWonUs, koWonOpp){
   zoneState[prefix+'shots']=true; zoneState[prefix+'opp']=true;
   function refreshShots(){
