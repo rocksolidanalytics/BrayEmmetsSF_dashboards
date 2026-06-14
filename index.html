@@ -219,6 +219,13 @@
   </div>
 
   <div class="card">
+    <div class="card-title">Kickout Intelligence — Distance × Speed Matrix</div>
+    <div class="card-sub">Win % by how far and how fast Bray restart · 104 kickouts across 6 games</div>
+    <div class="ko-grid" id="ko-matrix" style="grid-template-columns:56px 1fr 1fr 1fr;"></div>
+    <div class="note" id="ko-matrix-insight"></div>
+  </div>
+
+  <div class="card">
     <div class="card-title">Kickout Speed by Match</div>
     <div id="ko-speed-by-match"></div>
   </div>
@@ -10619,7 +10626,68 @@
   "Bray restarted in an average of 25.4s \u2014 quicker than the season average of 25.7s. Fastest restart of the game was 13s, slowest 55s.",
   "Cathal Magee and Padraig Doyle were central to everything going forward \u2014 between them they drove both the scoring and the pressure that forced Blessington turnovers.",
   "The 54% possession share wasn't dominant, but Bray used it better \u2014 27 shots (59% accuracy) versus 21 for Blessington (52%). Quality over quantity."
- ]
+ ],
+ "koMatrix": {
+  "matrix": [
+   [
+    {
+     "n": 5,
+     "won": 4,
+     "pct": 80
+    },
+    {
+     "n": 7,
+     "won": 6,
+     "pct": 86
+    },
+    {
+     "n": 1,
+     "won": 1,
+     "pct": 100
+    }
+   ],
+   [
+    {
+     "n": 10,
+     "won": 7,
+     "pct": 70
+    },
+    {
+     "n": 15,
+     "won": 10,
+     "pct": 67
+    },
+    {
+     "n": 14,
+     "won": 7,
+     "pct": 50
+    }
+   ],
+   [
+    {
+     "n": 12,
+     "won": 8,
+     "pct": 67
+    },
+    {
+     "n": 20,
+     "won": 11,
+     "pct": 55
+    },
+    {
+     "n": 20,
+     "won": 12,
+     "pct": 60
+    }
+   ]
+  ],
+  "speedThresholds": {
+   "fast": "<20s",
+   "medium": "20-26s",
+   "slow": ">26s"
+  },
+  "totalKOs": 104
+ }
 };</script>
 <script>
 const D = window.__RSA__;
@@ -11003,8 +11071,38 @@ renderKoSpeed(document.getElementById('ko-speed-match'),[
   {label:'After Score', bray:mks?mks.afterScore:null, brayLeagueAvg:null, opp:mko?mko.afterScore:null, oppLeagueAvg:null, fastest_b:null, slowest_b:null, fastest_o:null, slowest_o:null},
 ]);
 
-// KO speed by match
-const kmbEl=document.getElementById('ko-speed-by-match');
+// ---- KO MATRIX (Distance x Speed) ----
+const kmEl = document.getElementById('ko-matrix');
+const km = D.koMatrix;
+kmEl.innerHTML = '';
+kmEl.appendChild(document.createElement('div'));
+const speedLabels = [`⚡ FAST`, `▸ MED`, `🐢 SLOW`];
+const speedSubs = [km.speedThresholds.fast, km.speedThresholds.medium, km.speedThresholds.slow];
+speedLabels.forEach((c,i)=>{
+  const d = document.createElement('div');
+  d.className='colhead';
+  d.innerHTML=`${c}<br><span style="font-size:0.52rem;opacity:0.7;">${speedSubs[i]}</span>`;
+  kmEl.appendChild(d);
+});
+['SHORT','MID','LONG'].forEach((rl,ri)=>{
+  const rh = document.createElement('div');
+  rh.className='rowhead';
+  rh.textContent=rl;
+  kmEl.appendChild(rh);
+  km.matrix[ri].forEach(cell=>{
+    const col = cell.pct===null ? '#7a90aa' : cell.pct>=70 ? NEON.green : cell.pct>=55 ? '#ffdd00' : NEON.red;
+    const div = document.createElement('div');
+    div.className='ko-cell';
+    div.style.borderColor = cell.pct===null ? '#111a2e' : col+'55';
+    div.style.background = cell.pct===null ? '#080f20' : col+'15';
+    div.innerHTML=`<div class="pct" style="color:${col}">${cell.pct===null?'—':cell.pct+'%'}</div><div class="n">${cell.n} KOs</div>`;
+    kmEl.appendChild(div);
+  });
+});
+document.getElementById('ko-matrix-insight').textContent =
+  'Short kickouts win regardless of speed (80-100%). Mid-range kickouts are the key battleground — fast mid-range wins 70%, slow drops to 50%. Going long is a coin flip either way.';
+
+// ---- KO SPEED BY MATCH ----const kmbEl=document.getElementById('ko-speed-by-match');
 D.koSpeedByMatch.forEach(m=>{
   const div=document.createElement('div'); div.style.cssText='display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);font-size:0.78rem;';
   const max_t=70;
