@@ -10693,6 +10693,7 @@ const NEON = {green:"#00ff88",red:"#ff3355",purple:"#cc44ff",gold:"#ffdd00"};
 const C_bg="#070c18", LN="rgba(255,255,255,0.5)", LN2="rgba(255,255,255,0.28)";
 const isSc=c=>["P","G","2"].includes(c);
 const zoneState={};
+const DC=['#34c967','#f0c040','#4a9eff','#cc44ff','#ff3355','#7a90aa','#ff8800'];
 
 // ---- TABS ----
 document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
@@ -11309,7 +11310,6 @@ renderPeriodChart('period-match-svg', lps.bray, lps.opp, ps.labels);
 document.getElementById('period-opp-label').textContent=LM.meta.opp;
 
 // ---- DONUTS ----
-const DC=['#34c967','#f0c040','#4a9eff','#cc44ff','#ff3355','#7a90aa','#ff8800'];
 function renderDonut(svgEl,legEl,dataObj){
   const entries=Object.entries(dataObj); const total=entries.reduce((a,[,v])=>a+v,0);
   const cx=60,cy=60,r=45,stroke=18,circ=2*Math.PI*r; let offset=0, s='';
