@@ -117,8 +117,9 @@
     </div>
   </div>
   <div class="tabs">
-    <button class="tab active" data-view="season">All League Games</button>
-    <button class="tab" data-view="latest">Latest Match</button>
+    <button class="tab active" data-view="season">All League</button>
+    <button class="tab" data-view="matches">Match Reports</button>
+    <button class="tab" data-view="latest">Latest</button>
   </div>
 </div>
 
@@ -250,6 +251,15 @@
     </div>
   </div>
 
+</section>
+
+<!-- ===== MATCH REPORTS TAB ===== -->
+<section class="view" id="matches">
+  <div class="card">
+    <div class="card-title">Select Match</div>
+    <select id="match-selector" style="width:100%;padding:12px;background:var(--navy-deep);color:var(--text);border:1px solid var(--border);border-radius:8px;font-size:0.9rem;font-weight:600;font-family:inherit;appearance:none;-webkit-appearance:none;background-image:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%228%22><path d=%22M1 1l5 5 5-5%22 stroke=%22%237a90aa%22 fill=%22none%22 stroke-width=%222%22/></svg>');background-repeat:no-repeat;background-position:right 12px center;cursor:pointer;"></select>
+  </div>
+  <div id="match-report-container"></div>
 </section>
 
 <!-- ===== LATEST MATCH TAB ===== -->
@@ -10689,6 +10699,189 @@ document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
   t.classList.add('active');
   document.getElementById(t.dataset.view).classList.add('active');
 }));
+
+// ---- MATCH REPORTS TAB ----
+const matchSelector = document.getElementById('match-selector');
+const matchContainer = document.getElementById('match-report-container');
+
+// Populate dropdown
+D.allMatches.forEach((m,i)=>{
+  const opt = document.createElement('option');
+  opt.value = i;
+  const sl = m.scoreLine;
+  const res = sl.margin>0?'W':sl.margin<0?'L':'D';
+  opt.textContent = `${m.meta.date} — ${m.meta.opp} (${sl.us.main} v ${sl.them.main}, ${res})`;
+  matchSelector.appendChild(opt);
+});
+// Default to latest
+matchSelector.value = D.allMatches.length - 1;
+
+function renderMatchReport(idx){
+  const M = D.allMatches[idx];
+  const sl = M.scoreLine;
+  const margin = sl.margin;
+  const resText = margin>0?`WIN by ${margin} point${margin===1?'':'s'}`:margin<0?`LOSS by ${-margin} point${-margin===1?'':'s'}`:'DRAW';
+  const resCol = margin>0?'var(--green)':margin<0?'var(--red)':'var(--gold)';
+  const resBg = margin>0?'rgba(52,201,103,0.12)':margin<0?'rgba(224,69,69,0.12)':'rgba(240,192,64,0.12)';
+  const resBorder = margin>0?'rgba(52,201,103,0.3)':margin<0?'rgba(224,69,69,0.3)':'rgba(240,192,64,0.3)';
+
+  let twoPtLine = '';
+  const parts=[];
+  if(sl.us.twoPt) parts.push(`Bray ${sl.us.twoPt}x2pt`);
+  if(sl.them.twoPt) parts.push(`${M.meta.opp} ${sl.them.twoPt}x2pt`);
+  if(parts.length) twoPtLine = `<div class="sb-2pt">2-Pointers: ${parts.join(' · ')}</div>`;
+
+  let html = `
+  <div class="card">
+    <div class="scoreboard">
+      <div class="sb-meta"><div class="sb-meta-line">Wicklow SFL · ${M.meta.date}</div><div class="sb-meta-line">${M.meta.venue}</div></div>
+      <div class="sb-row">
+        <div class="sb-team us"><div class="sb-team-name">Bray Emmets</div><div class="sb-score">${sl.us.main}</div><div class="sb-frees">frees ${sl.us.frees}</div></div>
+        <div class="sb-vs">v</div>
+        <div class="sb-team"><div class="sb-team-name">${M.meta.opp}</div><div class="sb-score">${sl.them.main}</div></div>
+      </div>
+      ${twoPtLine}
+      <div class="result-banner" style="color:${resCol};background:${resBg};border-color:${resBorder};">${resText}</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Score Progression</div>
+    <div class="timeline-wrap"><svg id="mr-timeline-${idx}" viewBox="0 0 600 200" style="width:100%;display:block;" preserveAspectRatio="xMidYMid meet"></svg></div>
+    <div class="legend"><span><i class="dot" style="background:var(--green)"></i>Bray Emmets</span><span><i class="dot" style="background:var(--text-dim)"></i>${M.meta.opp}</span></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Team Comparison</div>
+    <div id="mr-compare-${idx}"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Pitch Maps</div>
+    <div class="view-tabs">
+      <button class="view-tab active" data-pmview="mr${idx}-shots">Our Shots</button>
+      <button class="view-tab" data-pmview="mr${idx}-opp">Opp Shots</button>
+      <button class="view-tab" data-pmview="mr${idx}-ko">Our KOs</button>
+      <button class="view-tab" data-pmview="mr${idx}-oppko">Opp KOs</button>
+    </div>
+    <div id="pm-mr${idx}-shots" class="pmview">
+      <div class="card-sub" id="pm-mr${idx}-shots-sub"></div>
+      <div class="pitch-wrap"><svg class="pitch-svg" id="pitch-mr${idx}-shots" viewBox="0 0 240 200"></svg></div>
+      <button class="toggle-btn" id="ztog-mr${idx}-shots">◉ ZONE CONVERSION ON</button>
+      <div class="legend"><span><i class="dot" style="background:#00ff88"></i>Score</span><span><i class="dot" style="background:#cc44ff"></i>Goal</span><span><i class="dot" style="background:#ff3355"></i>Miss</span></div>
+    </div>
+    <div id="pm-mr${idx}-opp" class="pmview" style="display:none">
+      <div class="card-sub" id="pm-mr${idx}-opp-sub"></div>
+      <div class="pitch-wrap"><svg class="pitch-svg" id="pitch-mr${idx}-opp" viewBox="0 0 240 200"></svg></div>
+      <button class="toggle-btn" id="ztog-mr${idx}-opp">◉ ZONE CONVERSION ON</button>
+      <div class="legend"><span><i class="dot" style="background:#00ff88"></i>Score</span><span><i class="dot" style="background:#cc44ff"></i>Goal</span><span><i class="dot" style="background:#ff3355"></i>Miss</span></div>
+    </div>
+    <div id="pm-mr${idx}-ko" class="pmview" style="display:none">
+      <div class="card-sub" id="pm-mr${idx}-ko-sub"></div>
+      <div class="pitch-wrap"><svg class="pitch-svg" id="pitch-mr${idx}-ko" viewBox="0 0 240 200"></svg></div>
+      <div class="legend" style="margin-bottom:12px;"><span><i class="dot" style="background:#00ff88"></i>Won</span><span><i class="dot" style="background:#ff3355"></i>Lost</span></div>
+      <div class="card-title" style="margin-top:5px;">Kickout Win % by Zone</div>
+      <div class="ko-grid" id="ko-mr${idx}-grid"></div>
+    </div>
+    <div id="pm-mr${idx}-oppko" class="pmview" style="display:none">
+      <div class="card-sub" id="pm-mr${idx}-oppko-sub"></div>
+      <div class="pitch-wrap"><svg class="pitch-svg" id="pitch-mr${idx}-oppko" viewBox="0 0 240 200"></svg></div>
+      <div class="legend" style="margin-bottom:12px;"><span><i class="dot" style="background:#00ff88"></i>Won</span><span><i class="dot" style="background:#ff3355"></i>Lost</span></div>
+      <div class="card-title" style="margin-top:5px;">Opposition KO Win % by Zone</div>
+      <div class="ko-grid" id="ko-mr${idx}-oppgrid"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Scorers</div>
+    <div id="mr-scorers-${idx}"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Tackles &amp; Frees Conceded</div>
+    <div id="mr-tackles-${idx}"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Possession Lost</div>
+    <div style="display:flex;gap:8px;">
+      <div style="flex:1;text-align:center;">
+        <div style="font-size:0.68rem;font-family:monospace;color:var(--green);margin-bottom:5px;">BRAY EMMETS</div>
+        <svg viewBox="0 0 120 120" id="mr-donut-us-${idx}" style="width:100%;max-width:140px;"></svg>
+        <div id="mr-donut-us-leg-${idx}" style="margin-top:7px;"></div>
+      </div>
+      <div style="flex:1;text-align:center;">
+        <div style="font-size:0.68rem;font-family:monospace;color:var(--text-dim);margin-bottom:5px;">${M.meta.opp.toUpperCase()}</div>
+        <svg viewBox="0 0 120 120" id="mr-donut-them-${idx}" style="width:100%;max-width:140px;"></svg>
+        <div id="mr-donut-them-leg-${idx}" style="margin-top:7px;"></div>
+      </div>
+    </div>
+  </div>`;
+
+  matchContainer.innerHTML = html;
+
+  // Render timeline
+  const tSvg = document.getElementById('mr-timeline-'+idx);
+  const tW=600,tH=200,pL=34,pR=14,pT=14,pB=28,ML=60;
+  const maxS=Math.max(...M.timeline.map(p=>Math.max(p.h,p.a)),1);
+  const tx=t=>pL+(t/ML)*(tW-pL-pR), ty=v=>tH-pB-(v/maxS)*(tH-pT-pB);
+  let ts='';
+  for(let v=0;v<=maxS;v+=Math.ceil(maxS/5)){
+    ts+=`<line x1="${pL}" y1="${ty(v)}" x2="${tW-pR}" y2="${ty(v)}" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>`;
+    ts+=`<text x="${pL-6}" y="${ty(v)+4}" font-size="9" fill="#7a90aa" text-anchor="end">${v}</text>`;
+  }
+  ts+=`<line x1="${tx(30)}" y1="${pT}" x2="${tx(30)}" y2="${tH-pB}" stroke="rgba(255,255,255,0.15)" stroke-width="1" stroke-dasharray="3,3"/>`;
+  ts+=`<text x="${tx(30)}" y="${tH-10}" font-size="9" fill="#7a90aa" text-anchor="middle">HT</text>`;
+  function mrPath(key,color){
+    let pts=[[0,0]]; M.timeline.forEach(p=>pts.push([p.m,p[key]])); pts.push([ML,pts[pts.length-1][1]]);
+    let d=`M ${tx(pts[0][0])} ${ty(pts[0][1])}`;
+    for(let i=1;i<pts.length;i++) d+=` L ${tx(pts[i][0])} ${ty(pts[i-1][1])} L ${tx(pts[i][0])} ${ty(pts[i][1])}`;
+    return `<path d="${d}" fill="none" stroke="${color}" stroke-width="2.5"/>`;
+  }
+  ts+=mrPath('a','#7a90aa'); ts+=mrPath('h','#34c967');
+  [0,15,45,60].forEach(t=>{ts+=`<text x="${tx(t)}" y="${tH-10}" font-size="9" fill="#7a90aa" text-anchor="middle">${t===0?"0'":t===60?"FT":t+"'"}</text>`;});
+  tSvg.innerHTML=ts;
+
+  // Render compare
+  renderCompare(document.getElementById('mr-compare-'+idx), M.compare);
+
+  // Pitch maps
+  setupPitchMap('mr'+idx+'-', M.shotsUs, M.shotsOpp, M.zonesUs, M.zonesOpp, M.koUs, M.koOpp, M.koGridUs, M.koGridOpp, M.koWonUs, M.koWonOpp);
+
+  // Re-bind view tabs within this card
+  matchContainer.querySelectorAll('.view-tab').forEach(tab=>{
+    tab.addEventListener('click',()=>{
+      const group=tab.closest('.card');
+      group.querySelectorAll('.view-tab').forEach(t=>t.classList.remove('active'));
+      group.querySelectorAll('.pmview').forEach(v=>v.style.display='none');
+      tab.classList.add('active');
+      document.getElementById('pm-'+tab.dataset.pmview).style.display='block';
+    });
+  });
+
+  // Scorers
+  const msEl2=document.getElementById('mr-scorers-'+idx);
+  M.scorers.forEach((p,i)=>{
+    const d=document.createElement('div'); d.className='lb-row';
+    d.innerHTML=`<div class="lb-rank">${i+1}</div><div class="lb-name">${p.name}</div><div class="lb-sub">${p.notation}</div><div class="lb-val">${p.total}</div>`;
+    msEl2.appendChild(d);
+  });
+
+  // Tackles
+  const mtEl2=document.getElementById('mr-tackles-'+idx);
+  M.tackles.forEach((p,i)=>{
+    const d=document.createElement('div'); d.className='lb-row';
+    d.innerHTML=`<div class="lb-rank">${i+1}</div><div class="lb-name">${p.name}</div><div class="lb-sub">${p.frees>0?p.frees+' free'+(p.frees>1?'s':'')+' conceded':''}</div><div class="lb-val">${p.tackles}</div>`;
+    mtEl2.appendChild(d);
+  });
+
+  // Donuts
+  if(Object.keys(M.possLost.us).length) renderDonut(document.getElementById('mr-donut-us-'+idx), document.getElementById('mr-donut-us-leg-'+idx), M.possLost.us);
+  if(Object.keys(M.possLost.them).length) renderDonut(document.getElementById('mr-donut-them-'+idx), document.getElementById('mr-donut-them-leg-'+idx), M.possLost.them);
+}
+
+matchSelector.addEventListener('change', ()=> renderMatchReport(parseInt(matchSelector.value)));
+renderMatchReport(D.allMatches.length - 1);
 
 // ---- SEASON SNAPSHOT ----
 const rec=D.record;
