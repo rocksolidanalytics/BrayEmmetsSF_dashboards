@@ -198,14 +198,14 @@
     </div>
     <div id="pm-s-ko" class="pmview" style="display:none">
       <div class="card-sub" id="pm-s-ko-sub"></div>
-      <div class="pitch-wrap"><svg class="pitch-svg full" id="pitch-s-ko" viewBox="0 0 240 360"></svg></div>
+      <div class="pitch-wrap"><svg class="pitch-svg" id="pitch-s-ko" viewBox="0 0 240 200"></svg></div>
       <div class="legend" style="margin-bottom:12px;"><span><i class="dot" style="background:#00ff88"></i>Won</span><span><i class="dot" style="background:#ff3355"></i>Lost</span></div>
       <div class="card-title" style="margin-top:5px;">Kickout Win % by Zone</div>
       <div class="ko-grid" id="ko-s-grid"></div>
     </div>
     <div id="pm-s-oppko" class="pmview" style="display:none">
       <div class="card-sub" id="pm-s-oppko-sub"></div>
-      <div class="pitch-wrap"><svg class="pitch-svg full" id="pitch-s-oppko" viewBox="0 0 240 360"></svg></div>
+      <div class="pitch-wrap"><svg class="pitch-svg" id="pitch-s-oppko" viewBox="0 0 240 200"></svg></div>
       <div class="legend" style="margin-bottom:12px;"><span><i class="dot" style="background:#00ff88"></i>Won</span><span><i class="dot" style="background:#ff3355"></i>Lost</span></div>
       <div class="card-title" style="margin-top:5px;">Opposition Kickout Win % by Zone</div>
       <div class="ko-grid" id="ko-s-oppgrid"></div>
@@ -297,14 +297,14 @@
     </div>
     <div id="pm-m-ko" class="pmview" style="display:none">
       <div class="card-sub" id="pm-m-ko-sub"></div>
-      <div class="pitch-wrap"><svg class="pitch-svg full" id="pitch-m-ko" viewBox="0 0 240 360"></svg></div>
+      <div class="pitch-wrap"><svg class="pitch-svg" id="pitch-m-ko" viewBox="0 0 240 200"></svg></div>
       <div class="legend" style="margin-bottom:12px;"><span><i class="dot" style="background:#00ff88"></i>Won</span><span><i class="dot" style="background:#ff3355"></i>Lost</span></div>
       <div class="card-title" style="margin-top:5px;">Kickout Win % by Zone</div>
       <div class="ko-grid" id="ko-m-grid"></div>
     </div>
     <div id="pm-m-oppko" class="pmview" style="display:none">
       <div class="card-sub" id="pm-m-oppko-sub"></div>
-      <div class="pitch-wrap"><svg class="pitch-svg full" id="pitch-m-oppko" viewBox="0 0 240 360"></svg></div>
+      <div class="pitch-wrap"><svg class="pitch-svg" id="pitch-m-oppko" viewBox="0 0 240 200"></svg></div>
       <div class="legend" style="margin-bottom:12px;"><span><i class="dot" style="background:#00ff88"></i>Won</span><span><i class="dot" style="background:#ff3355"></i>Lost</span></div>
       <div class="card-title" style="margin-top:5px;">Opposition Kickout Win % by Zone</div>
       <div class="ko-grid" id="ko-m-oppgrid"></div>
@@ -10834,28 +10834,26 @@ function renderShotPitch(svgEl,pts,zones){
   svgEl.innerHTML=s;
 }
 function renderKoPitch(svgEl,pts){
-  const W=240,H=360,L=10,R=230,T=10,B=350,MX=120;
-  const yT=f=>T+f*(B-T), yB=f=>B-f*(B-T); let s='';
-  s+=`<rect x="0" y="0" width="${W}" height="${H}" fill="${C_bg}"/>`;
-  s+=`<rect x="${L}" y="${T}" width="${R-L}" height="${B-T}" fill="none" stroke="${LN}" stroke-width="2" rx="2"/>`;
-  s+=`<line x1="${L}" y1="${(T+B)/2}" x2="${R}" y2="${(T+B)/2}" stroke="${LN2}" stroke-width="1.5" stroke-dasharray="8,5"/>`;
-  [{e:T,y:yT,sgn:1},{e:B,y:yB,sgn:-1}].forEach(en=>{
-    const y13=en.y(0.093),y20=en.y(0.143),yD=en.y(0.236),yARC=en.y(0.286),y45=en.y(0.321),y65=en.y(0.464);
-    s+=`<rect x="${MX-15}" y="${Math.min(en.e,en.e+en.sgn*10)}" width="30" height="10" fill="none" stroke="${LN}" stroke-width="1"/>`;
-    s+=`<rect x="${MX-44}" y="${Math.min(en.e,y13)}" width="88" height="${Math.abs(y13-en.e)}" fill="none" stroke="${LN}" stroke-width="1"/>`;
-    s+=`<line x1="${L}" y1="${y13}" x2="${MX-44}" y2="${y13}" stroke="${LN2}" stroke-width="0.8"/>`;
-    s+=`<line x1="${MX+44}" y1="${y13}" x2="${R}" y2="${y13}" stroke="${LN2}" stroke-width="0.8"/>`;
-    s+=`<line x1="${L}" y1="${y20}" x2="${R}" y2="${y20}" stroke="${LN}" stroke-width="1.3"/>`;
-    s+=`<line x1="${L}" y1="${y45}" x2="${R}" y2="${y45}" stroke="${LN}" stroke-width="1"/>`;
-    s+=`<line x1="${L}" y1="${y65}" x2="${R}" y2="${y65}" stroke="${LN2}" stroke-width="0.8"/>`;
-    s+=`<path d="M${L+4},${y13} Q${MX},${2*yARC-y13} ${R-4},${y13}" fill="none" stroke="${LN}" stroke-width="1.6"/>`;
-    s+=`<path d="M${MX-26},${y20} Q${MX},${2*yD-y20} ${MX+26},${y20}" fill="none" stroke="${LN}" stroke-width="1.1"/>`;
-    s+=`<line x1="${MX-16}" y1="${en.e-en.sgn*2}" x2="${MX+16}" y2="${en.e-en.sgn*2}" stroke="#fff" stroke-width="3" stroke-linecap="round"/>`;
-  });
+  // Half-pitch version — fold kickouts same as shots (attacking goal at top)
+  renderShotPitch(svgEl, pts.map(d => {
+    // Fold: if x>0.5, ax=x,side=y; else ax=1-x,side=1-y
+    let ax,side;
+    if(d[0]>0.5){ax=d[0];side=d[1];}else{ax=1-d[0];side=1-d[1];}
+    return [ax, side, d[2]];
+  }), null);
+  // Re-render dots with KO colors over the shot pitch
+  const W=240,H=200,L=10,R=230,T=10,B=190;
+  const yf=f=>T+((1-f)/0.5)*(B-T);
+  let extra='';
   pts.forEach(d=>{
-    s+=`<circle cx="${L+d[1]*(R-L)}" cy="${T+(1-d[0])*(B-T)}" r="3" fill="${colFor('ko',d[2])}" opacity="0.7" stroke="rgba(255,255,255,0.3)" stroke-width="0.3"/>`;
+    let ax,side;
+    if(d[0]>0.5){ax=d[0];side=d[1];}else{ax=1-d[0];side=1-d[1];}
+    if(ax<0.5) return;
+    const px=L+(side*(R-L)), py=yf(ax);
+    const col=d[2]==='W'?NEON.green:NEON.red;
+    extra+=`<circle cx="${px}" cy="${py}" r="3" fill="${col}" opacity="0.7" stroke="rgba(255,255,255,0.3)" stroke-width="0.3"/>`;
   });
-  svgEl.innerHTML=s;
+  svgEl.innerHTML+=extra;
 }
 function renderKoGrid(el,grid){
   el.innerHTML=''; el.appendChild(document.createElement('div'));
