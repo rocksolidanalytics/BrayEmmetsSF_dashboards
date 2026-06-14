@@ -11102,7 +11102,8 @@ speedLabels.forEach((c,i)=>{
 document.getElementById('ko-matrix-insight').textContent =
   'Short kickouts win regardless of speed (80-100%). Mid-range kickouts are the key battleground — fast mid-range wins 70%, slow drops to 50%. Going long is a coin flip either way.';
 
-// ---- KO SPEED BY MATCH ----const kmbEl=document.getElementById('ko-speed-by-match');
+// ---- KO SPEED BY MATCH ----
+const kmbEl=document.getElementById('ko-speed-by-match');
 D.koSpeedByMatch.forEach(m=>{
   const div=document.createElement('div'); div.style.cssText='display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);font-size:0.78rem;';
   const max_t=70;
