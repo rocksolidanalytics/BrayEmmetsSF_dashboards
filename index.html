@@ -13,13 +13,20 @@
   *{box-sizing:border-box;margin:0;padding:0;}
   body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--navy-deep);color:var(--text);line-height:1.5;-webkit-font-smoothing:antialiased;}
   .header{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-deep) 100%);border-bottom:3px solid var(--green);padding:16px 16px 0;position:sticky;top:0;z-index:50;}
-  .header-top{display:flex;align-items:center;gap:10px;max-width:700px;margin:0 auto;}
+  .header-top{display:flex;align-items:center;gap:10px;max-width:1200px;margin:0 auto;}
   .header-title h1{font-size:1.1rem;font-weight:800;color:var(--text);}
   .header-title p{font-size:0.7rem;color:var(--green);text-transform:uppercase;letter-spacing:0.12em;font-weight:600;margin-top:1px;}
-  .tabs{display:flex;max-width:700px;margin:14px auto 0;gap:4px;}
+  .tabs{display:flex;max-width:1200px;margin:14px auto 0;gap:4px;}
   .tab{flex:1;text-align:center;padding:11px 8px;font-size:0.82rem;font-weight:700;color:var(--text-dim);background:transparent;border:none;border-bottom:3px solid transparent;cursor:pointer;transition:all 0.15s;letter-spacing:0.02em;}
   .tab.active{color:var(--green);border-bottom-color:var(--green);}
-  main{max-width:700px;margin:0 auto;padding:16px 13px 60px;}
+  main{max-width:1200px;margin:0 auto;padding:16px 13px 60px;}
+  @media(min-width:760px){
+    .grid-row{display:grid;grid-template-columns:1fr 1fr;gap:13px;}
+    .grid-row>.card{margin-bottom:0;}
+    .grid-full{grid-column:1/-1;}
+    main{padding:20px 24px 60px;}
+    .header-top,.tabs{max-width:1200px;}
+  }
   .view{display:none;}
   .view.active{display:block;animation:fadeIn 0.2s ease;}
   @keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
@@ -128,6 +135,7 @@
 <!-- ===== SEASON TAB ===== -->
 <section class="view active" id="season">
 
+  <div class="grid-row">
   <div class="card">
     <div class="card-title">Season Snapshot</div>
     <div class="stat-grid">
@@ -142,7 +150,9 @@
     <div id="results-list"></div>
     <div class="note">An Tóchar &amp; Tinahely shown as results only — match data not tagged.</div>
   </div>
+  </div>
 
+  <div class="grid-row">
   <div class="card">
     <div class="card-title">Season Scoring Leaderboard</div>
     <div id="season-scorers"></div>
@@ -153,7 +163,9 @@
     <div class="card-sub" style="font-family:monospace;">MP = MATCHES PLAYED · T = TACKLES · FC = FREES CONCEDED</div>
     <div id="player-table"></div>
   </div>
+  </div>
 
+  <div class="grid-row">
   <div class="card">
     <div class="card-title">Tackles — Bray vs Opposition by Match</div>
     <div id="tackles-by-match"></div>
@@ -173,7 +185,9 @@
     <div class="legend"><span><i class="dot" style="background:var(--green)"></i>Bray Emmets</span><span><i class="dot" style="background:var(--text-dim)"></i>Opposition</span></div>
     <div class="note" id="period-season-insight"></div>
   </div>
+  </div>
 
+  <div class="grid-row">
   <div class="card">
     <div class="card-title">Season Team Comparison (vs Amalgamated Opposition)</div>
     <div id="season-compare"></div>
@@ -182,6 +196,7 @@
   <div class="card">
     <div class="card-title">Season Analysis</div>
     <ul class="summary-list" id="season-commentary"></ul>
+  </div>
   </div>
 
   <div class="card">
@@ -221,6 +236,7 @@
     </div>
   </div>
 
+  <div class="grid-row">
   <div class="card">
     <div class="card-title">Kickout Speed — Season (Bray vs Opposition)</div>
     <div class="card-sub">Fastest · Average · Slowest restart times across all league games</div>
@@ -232,6 +248,7 @@
     <div class="card-sub">Win % by how far and how fast Bray restart · 104 kickouts across 6 games</div>
     <div class="ko-grid" id="ko-matrix" style="grid-template-columns:56px 1fr 1fr 1fr;"></div>
     <div class="note" id="ko-matrix-insight"></div>
+  </div>
   </div>
 
   <div class="card">
@@ -281,6 +298,7 @@
     </div>
   </div>
 
+  <div class="grid-row">
   <div class="card">
     <div class="card-title">Score Progression</div>
     <div class="timeline-wrap"><svg class="timeline-svg" id="timeline-svg" viewBox="0 0 600 200" preserveAspectRatio="xMidYMid meet"></svg></div>
@@ -290,6 +308,7 @@
   <div class="card">
     <div class="card-title">Team Comparison</div>
     <div id="match-compare"></div>
+  </div>
   </div>
 
   <div class="card">
@@ -337,6 +356,7 @@
     <div class="legend"><span><i class="dot" style="background:var(--green)"></i>Bray Emmets</span><span><i class="dot" style="background:var(--text-dim)" id="period-opp-label"></i></span></div>
   </div>
 
+  <div class="grid-row">
   <div class="card">
     <div class="card-title">Scorers</div>
     <div id="match-scorers"></div>
@@ -345,6 +365,7 @@
   <div class="card">
     <div class="card-title">Tackles &amp; Frees Conceded</div>
     <div id="match-tackles"></div>
+  </div>
   </div>
 
   <div class="card">
