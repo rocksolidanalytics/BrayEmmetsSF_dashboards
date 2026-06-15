@@ -21,12 +21,14 @@
   .tab.active{color:var(--green);border-bottom-color:var(--green);}
   main{max-width:1200px;margin:0 auto;padding:16px 13px 60px;}
   @media(min-width:760px){
-    .grid-row{display:grid;grid-template-columns:1fr 1fr;gap:13px;}
+    .grid-row{display:grid;grid-template-columns:1fr 1fr;gap:13px;align-items:start;}
     .grid-row>.card{margin-bottom:0;}
     .grid-full{grid-column:1/-1;}
     main{padding:20px 24px 60px;}
     .header-top,.tabs{max-width:1200px;}
+    .season-banner .stat-grid{grid-template-columns:repeat(6,1fr);}
   }
+  .season-banner{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-card) 100%);border:1px solid rgba(52,201,103,0.2);}
   .view{display:none;}
   .view.active{display:block;animation:fadeIn 0.2s ease;}
   @keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
@@ -135,29 +137,25 @@
 <!-- ===== SEASON TAB ===== -->
 <section class="view active" id="season">
 
-  <div class="grid-row">
-  <div class="card">
-    <div class="card-title">Season Snapshot</div>
-    <div class="stat-grid">
-      <div class="stat-box"><div class="num" id="sn-record"></div><div class="lbl">W-D-L</div></div>
-      <div class="stat-box"><div class="num" id="sn-for"></div><div class="lbl">Pts For (avg)</div></div>
-      <div class="stat-box"><div class="num" id="sn-ag"></div><div class="lbl">Pts Against (avg)</div></div>
-    </div>
+  <div class="card season-banner">
+    <div class="card-title">Season Snapshot — 2026 Senior Football League</div>
+    <div class="stat-grid" id="banner-stats"></div>
   </div>
 
+  <div class="grid-row">
   <div class="card">
     <div class="card-title">2026 SFL — Results</div>
     <div id="results-list"></div>
     <div class="note">An Tóchar &amp; Tinahely shown as results only — match data not tagged.</div>
   </div>
-  </div>
 
-  <div class="grid-row">
   <div class="card">
     <div class="card-title">Season Scoring Leaderboard</div>
     <div id="season-scorers"></div>
   </div>
+  </div>
 
+  <div class="grid-row">
   <div class="card">
     <div class="card-title">Player Stats — All League Games</div>
     <div class="card-sub" style="font-family:monospace;">MP = MATCHES PLAYED · T = TACKLES · FC = FREES CONCEDED</div>
@@ -10907,12 +10905,26 @@ function renderMatchReport(idx){
 matchSelector.addEventListener('change', ()=> renderMatchReport(parseInt(matchSelector.value)));
 renderMatchReport(D.allMatches.length - 1);
 
-// ---- SEASON SNAPSHOT ----
+// ---- SEASON BANNER ----
 const rec=D.record;
-document.getElementById('sn-record').textContent=`${rec.W}-${rec.D}-${rec.L}`;
 const n=D.resultsTable.length;
-document.getElementById('sn-for').textContent=`${Math.round(rec.ptsFor/n)}`;
-document.getElementById('sn-ag').textContent=`${Math.round(rec.ptsAg/n)}`;
+const bannerEl=document.getElementById('banner-stats');
+const avgFor=Math.round(rec.ptsFor/n);
+const avgAg=Math.round(rec.ptsAg/n);
+const diff=rec.ptsFor-rec.ptsAg;
+const bannerStats=[
+  {num:`${rec.W}-${rec.D}-${rec.L}`, lbl:'W-D-L', col:'var(--green)'},
+  {num:n, lbl:'Played', col:'var(--text)'},
+  {num:avgFor, lbl:'Avg Scored', col:'var(--green)'},
+  {num:avgAg, lbl:'Avg Conceded', col:'var(--text-dim)'},
+  {num:(diff>=0?'+':'')+diff, lbl:'Points Diff', col:diff>=0?'var(--green)':'var(--red)'},
+  {num:Math.round(rec.ptsFor/(rec.ptsFor+rec.ptsAg)*100)+'%', lbl:'Score Share', col:'var(--green)'},
+];
+bannerStats.forEach(s=>{
+  const d=document.createElement('div'); d.className='stat-box';
+  d.innerHTML=`<div class="num" style="color:${s.col}">${s.num}</div><div class="lbl">${s.lbl}</div>`;
+  bannerEl.appendChild(d);
+});
 
 // ---- RESULTS TABLE ----
 const rl=document.getElementById('results-list');
