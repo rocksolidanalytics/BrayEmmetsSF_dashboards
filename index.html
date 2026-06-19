@@ -4349,7 +4349,7 @@
    "date": "19 Jun 2026",
    "opp": "Tinahely",
    "venue": "Old Conna",
-   "ref": ""
+   "ref": "Tiernan Hall"
   },
   "scoreLine": {
    "us": {
@@ -11030,7 +11030,7 @@
     "date": "19 Jun 2026",
     "opp": "Tinahely",
     "venue": "Old Conna",
-    "ref": ""
+    "ref": "Tiernan Hall"
    },
    "scoreLine": {
     "us": {
@@ -12247,7 +12247,7 @@ renderCompare(document.getElementById('match-compare'), LM.compare);
 // ---- SCOREBOARD (Latest) ----
 const sl=LM.scoreLine;
 document.getElementById('sb-comp').textContent=`Wicklow SFL · ${LM.meta.date}`;
-document.getElementById('sb-venue').textContent=`${LM.meta.venue} · Ref: Jason Smyth`;
+document.getElementById('sb-venue').textContent=`${LM.meta.venue}${LM.meta.ref?' · Ref: '+LM.meta.ref:''}`;
 document.getElementById('sb-them-name').textContent=LM.meta.opp;
 document.getElementById('sb-us-score').textContent=sl.us.main;
 document.getElementById('sb-them-score').textContent=sl.them.main;
