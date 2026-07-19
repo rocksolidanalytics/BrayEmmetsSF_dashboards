@@ -206,7 +206,7 @@
       <button class="view-tab" data-pmview="s-oppko">Opp KOs</button>
     </div>
     <div id="pm-s-shots" class="pmview">
-      <div class="card-sub" id="pm-s-shots-sub"></div>
+      <div class="card-sub" id="pm-s-shots-sub"></div><div class="card-sub" id="pm-s-shots-xp" style="color:#48e08b;font-weight:600;margin-top:2px"></div>
       <div class="pitch-wrap"><svg class="pitch-svg" id="pitch-s-shots" viewBox="0 0 240 200"></svg></div>
       <button class="toggle-btn" id="ztog-s-shots">◉ ZONE CONVERSION ON</button>
       <div class="legend"><span><i class="dot" style="background:#00ff88"></i>Score</span><span><i class="dot" style="background:#cc44ff"></i>Goal</span><span><i class="dot" style="background:#ff3355"></i>Miss</span></div>
@@ -12374,6 +12374,16 @@ function setupPitchMap(prefix, ptsUs, ptsOpp, zonesUs, zonesOpp, koUs, koOpp, ko
   function refreshShots(){
     const sc=ptsUs.filter(d=>isSc(d[2])).length;
     document.getElementById(`pm-${prefix}shots-sub`).textContent=`${ptsUs.length} SHOTS · ${sc} SCORES (${ptsUs.length?Math.round(sc/ptsUs.length*100):0}%)`;
+    if(prefix==='s-'){
+      const _V={P:1,'2':2,G:3};
+      const _zk=d=>Math.min(6,Math.floor(d[0]*7))+'_'+Math.min(4,Math.floor(d[1]*5));
+      const _zt={},_zc={};
+      ptsUs.concat(ptsOpp).forEach(d=>{const k=_zk(d);_zt[k]=(_zt[k]||0)+(_V[d[2]]||0);_zc[k]=(_zc[k]||0)+1;});
+      let _xp=0,_act=0;
+      ptsUs.forEach(d=>{const k=_zk(d);_xp+=_zc[k]?_zt[k]/_zc[k]:0;_act+=(_V[d[2]]||0);});
+      const _df=_act-_xp,_el=document.getElementById('pm-s-shots-xp');
+      if(_el)_el.textContent=`xP ${_xp.toFixed(1)} · SCORED ${_act} · ${_df>=0?'+':''}${_df.toFixed(1)} vs expected`;
+    }
     renderShotPitch(document.getElementById(`pitch-${prefix}shots`),ptsUs,zoneState[prefix+'shots']?zonesUs:null);
     const b=document.getElementById(`ztog-${prefix}shots`);
     b.textContent=zoneState[prefix+'shots']?'◉ ZONE CONVERSION ON':'○ ZONE CONVERSION OFF';
