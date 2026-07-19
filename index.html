@@ -208,7 +208,7 @@
     <div id="pm-s-shots" class="pmview">
       <div class="card-sub" id="pm-s-shots-sub"></div><div class="card-sub" id="pm-s-shots-xp" style="color:#48e08b;font-weight:600;margin-top:2px"></div>
       <div class="pitch-wrap"><svg class="pitch-svg" id="pitch-s-shots" viewBox="0 0 240 200"></svg></div>
-      <button class="toggle-btn" id="ztog-s-shots">◉ ZONE CONVERSION ON</button><div class="card-sub" style="margin-top:14px">EXPECTED POINTS BY ZONE · pts per shot, all shots pooled</div><div class="ko-grid" id="xp-s-grid"></div>
+      <button class="toggle-btn" id="ztog-s-shots">◉ ZONE CONVERSION ON</button><div class="card-sub" style="margin-top:14px">EXPECTED POINTS BY ZONE · pts per shot, all shots pooled</div><div class="ko-grid" id="xp-s-grid"></div><div class="card-sub" style="margin-top:14px">SHOT DENSITY HEAT MAP · where we shoot from</div><div class="pitch-wrap"><svg class="pitch-svg" id="heat-s-shots" viewBox="0 0 240 200"></svg></div>
       <div class="legend"><span><i class="dot" style="background:#00ff88"></i>Score</span><span><i class="dot" style="background:#cc44ff"></i>Goal</span><span><i class="dot" style="background:#ff3355"></i>Miss</span></div>
     </div>
     <div id="pm-s-opp" class="pmview" style="display:none">
@@ -12390,6 +12390,34 @@ function renderXpGrid(el,ptsUs,ptsOpp){
     }
   });
 }
+function renderShotHeat(svgEl,pts){
+  const W=240,H=200,L=10,R=230,T=10,B=190,MX=120;
+  const yf=f=>T+((1-f)/0.5)*(B-T);
+  const P=(pts||[]).filter(d=>d[0]>=0.5).map(d=>[L+d[1]*(R-L), yf(d[0])]);
+  const GX=18,GY=16,cw=(R-L)/GX,ch=(B-T)/GY,bw=16;
+  let grid=[],mx=0;
+  for(let gy=0;gy<GY;gy++){grid[gy]=[];for(let gx=0;gx<GX;gx++){
+    const cx=L+(gx+0.5)*cw,cy=T+(gy+0.5)*ch;let v=0;
+    for(let i=0;i<P.length;i++){const dx=P[i][0]-cx,dy=P[i][1]-cy;v+=Math.exp(-(dx*dx+dy*dy)/(2*bw*bw));}
+    grid[gy][gx]=v;if(v>mx)mx=v;
+  }}
+  let s=`<rect x="0" y="0" width="${W}" height="${H}" fill="${C_bg}"/>`;
+  s+=`<defs><filter id="shBlur" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="7"/></filter><clipPath id="shClip"><rect x="${L}" y="${T}" width="${R-L}" height="${B-T}" rx="2"/></clipPath></defs>`;
+  s+=`<g clip-path="url(#shClip)"><g filter="url(#shBlur)">`;
+  for(let gy=0;gy<GY;gy++)for(let gx=0;gx<GX;gx++){
+    const t=mx?grid[gy][gx]/mx:0;if(t<0.08)continue;
+    const hue=Math.round(120-120*Math.min(1,t)),op=(0.12+0.6*t).toFixed(2);
+    s+=`<rect x="${(L+gx*cw).toFixed(1)}" y="${(T+gy*ch).toFixed(1)}" width="${(cw+1).toFixed(1)}" height="${(ch+1).toFixed(1)}" fill="hsl(${hue},90%,52%)" opacity="${op}"/>`;
+  }
+  s+=`</g></g>`;
+  const y20=yf(0.857),y45=yf(0.679),yARC=yf(0.714),y13=yf(0.907);
+  s+=`<rect x="${L}" y="${T}" width="${R-L}" height="${B-T}" fill="none" stroke="${LN}" stroke-width="2" rx="2"/>`;
+  s+=`<line x1="${L}" y1="${y20}" x2="${R}" y2="${y20}" stroke="${LN}" stroke-width="1.3" opacity="0.7"/>`;
+  s+=`<line x1="${L}" y1="${y45}" x2="${R}" y2="${y45}" stroke="${LN2}" stroke-width="1" opacity="0.6"/>`;
+  s+=`<path d="M${L+4},${y13} Q${MX},${2*yARC-y13} ${R-4},${y13}" fill="none" stroke="${LN}" stroke-width="1.5" opacity="0.7"/>`;
+  s+=`<line x1="${MX-16}" y1="${T-2}" x2="${MX+16}" y2="${T-2}" stroke="#fff" stroke-width="3" stroke-linecap="round"/>`;
+  svgEl.innerHTML=s;
+}
 function setupPitchMap(prefix, ptsUs, ptsOpp, zonesUs, zonesOpp, koUs, koOpp, koGridUs, koGridOpp, koWonUs, koWonOpp){
   zoneState[prefix+'shots']=true; zoneState[prefix+'opp']=true;
   function refreshShots(){
@@ -12403,7 +12431,7 @@ function setupPitchMap(prefix, ptsUs, ptsOpp, zonesUs, zonesOpp, koUs, koOpp, ko
       let _xp=0,_act=0;
       ptsUs.forEach(d=>{const k=_zk(d);_xp+=_zc[k]?_zt[k]/_zc[k]:0;_act+=(_V[d[2]]||0);});
       const _df=_act-_xp,_el=document.getElementById('pm-s-shots-xp');
-      if(_el)_el.textContent=`xP ${_xp.toFixed(1)} · SCORED ${_act} · ${_df>=0?'+':''}${_df.toFixed(1)} vs expected`; const _g=document.getElementById('xp-s-grid'); if(_g)renderXpGrid(_g,ptsUs,ptsOpp);
+      if(_el)_el.textContent=`xP ${_xp.toFixed(1)} · SCORED ${_act} · ${_df>=0?'+':''}${_df.toFixed(1)} vs expected`; const _g=document.getElementById('xp-s-grid'); if(_g)renderXpGrid(_g,ptsUs,ptsOpp); const _h=document.getElementById('heat-s-shots'); if(_h)renderShotHeat(_h,ptsUs);
     }
     renderShotPitch(document.getElementById(`pitch-${prefix}shots`),ptsUs,zoneState[prefix+'shots']?zonesUs:null);
     const b=document.getElementById(`ztog-${prefix}shots`);
