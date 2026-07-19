@@ -208,7 +208,7 @@
     <div id="pm-s-shots" class="pmview">
       <div class="card-sub" id="pm-s-shots-sub"></div><div class="card-sub" id="pm-s-shots-xp" style="color:#48e08b;font-weight:600;margin-top:2px"></div>
       <div class="pitch-wrap"><svg class="pitch-svg" id="pitch-s-shots" viewBox="0 0 240 200"></svg></div>
-      <button class="toggle-btn" id="ztog-s-shots">◉ ZONE CONVERSION ON</button>
+      <button class="toggle-btn" id="ztog-s-shots">◉ ZONE CONVERSION ON</button><div class="card-sub" style="margin-top:14px">EXPECTED POINTS BY ZONE · pts per shot, all shots pooled</div><div class="ko-grid" id="xp-s-grid"></div>
       <div class="legend"><span><i class="dot" style="background:#00ff88"></i>Score</span><span><i class="dot" style="background:#cc44ff"></i>Goal</span><span><i class="dot" style="background:#ff3355"></i>Miss</span></div>
     </div>
     <div id="pm-s-opp" class="pmview" style="display:none">
@@ -12369,6 +12369,27 @@ function renderKoGrid(el,grid){
 }
 
 // Setup pitch map toggles
+function renderXpGrid(el,ptsUs,ptsOpp){
+  const V={P:1,'2':2,G:3};
+  const lane=y=> y<0.38?0 : y<0.62?1 : 2;
+  const dist=x=> x>=0.85?0 : x>=0.75?1 : 2;
+  const t={},n={};
+  (ptsUs||[]).concat(ptsOpp||[]).forEach(d=>{const k=dist(d[0])+'_'+lane(d[1]);t[k]=(t[k]||0)+(V[d[2]]||0);n[k]=(n[k]||0)+1;});
+  el.innerHTML=''; el.appendChild(document.createElement('div'));
+  ['LEFT','CENTRE','RIGHT'].forEach(c=>{const d=document.createElement('div');d.className='colhead';d.textContent=c;el.appendChild(d);});
+  ['CLOSE','MID','LONG'].forEach((rl,ri)=>{
+    const rh=document.createElement('div');rh.className='rowhead';rh.textContent=rl;el.appendChild(rh);
+    for(let ci=0;ci<3;ci++){
+      const k=ri+'_'+ci,cnt=n[k]||0,xp=cnt?t[k]/cnt:null;
+      const col=xp===null?'#7a90aa':xp>=0.8?NEON.green:xp>=0.5?'#ffdd00':NEON.red;
+      const d=document.createElement('div');d.className='ko-cell';
+      d.style.borderColor=xp===null?'#111a2e':col+'55';
+      d.style.background=xp===null?'#080f20':col+'15';
+      d.innerHTML=`<div class="pct" style="color:${col}">${xp===null?'\u2014':xp.toFixed(2)}</div><div class="n">${cnt} shots</div>`;
+      el.appendChild(d);
+    }
+  });
+}
 function setupPitchMap(prefix, ptsUs, ptsOpp, zonesUs, zonesOpp, koUs, koOpp, koGridUs, koGridOpp, koWonUs, koWonOpp){
   zoneState[prefix+'shots']=true; zoneState[prefix+'opp']=true;
   function refreshShots(){
@@ -12382,7 +12403,7 @@ function setupPitchMap(prefix, ptsUs, ptsOpp, zonesUs, zonesOpp, koUs, koOpp, ko
       let _xp=0,_act=0;
       ptsUs.forEach(d=>{const k=_zk(d);_xp+=_zc[k]?_zt[k]/_zc[k]:0;_act+=(_V[d[2]]||0);});
       const _df=_act-_xp,_el=document.getElementById('pm-s-shots-xp');
-      if(_el)_el.textContent=`xP ${_xp.toFixed(1)} · SCORED ${_act} · ${_df>=0?'+':''}${_df.toFixed(1)} vs expected`;
+      if(_el)_el.textContent=`xP ${_xp.toFixed(1)} · SCORED ${_act} · ${_df>=0?'+':''}${_df.toFixed(1)} vs expected`; const _g=document.getElementById('xp-s-grid'); if(_g)renderXpGrid(_g,ptsUs,ptsOpp);
     }
     renderShotPitch(document.getElementById(`pitch-${prefix}shots`),ptsUs,zoneState[prefix+'shots']?zonesUs:null);
     const b=document.getElementById(`ztog-${prefix}shots`);
